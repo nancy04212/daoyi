@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b23a26"/>
+      <stop offset="1" stop-color="#7a2014"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f6dc9a"/>
+      <stop offset="1" stop-color="#d4a548"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.42" r="0.45">
+      <stop offset="0" stop-color="#ffd98a" stop-opacity=".35"/>
+      <stop offset="1" stop-color="#ffd98a" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <circle cx="512" cy="470" r="420" fill="url(#glow)"/>
+  <!-- 圓明：一筆圓相，留一缺口 -->
+  <path d="M 300 760 A 300 300 0 1 1 724 760" fill="none" stroke="url(#gold)" stroke-width="26" stroke-linecap="round"/>
+  <!-- 心燈：火焰 -->
+  <path d="M512 228 C 560 310, 640 360, 620 470 C 606 548, 560 590, 512 600 C 464 590, 418 548, 404 470 C 384 360, 464 310, 512 228 Z" fill="url(#gold)"/>
+  <path d="M512 380 C 536 420, 570 450, 560 510 C 552 552, 532 572, 512 576 C 492 572, 472 552, 464 510 C 454 450, 488 420, 512 380 Z" fill="#9a2b1c"/>
+  <!-- 經卷：攤開的書 -->
+  <path d="M512 660 C 450 620, 340 610, 250 640 L 250 790 C 340 760, 450 770, 512 812 Z" fill="url(#gold)"/>
+  <path d="M512 660 C 574 620, 684 610, 774 640 L 774 790 C 684 760, 574 770, 512 812 Z" fill="url(#gold)"/>
+  <path d="M512 668 L 512 806" stroke="#8a2618" stroke-width="10" stroke-linecap="round"/>
+  <path d="M300 680 C 370 664, 440 670, 482 692 M300 720 C 370 704, 440 710, 482 732 M724 680 C 654 664, 584 670, 542 692 M724 720 C 654 704, 584 710, 542 732" stroke="#b9873a" stroke-width="8" fill="none" stroke-linecap="round" opacity=".7"/>
+</svg>
