@@ -23,6 +23,7 @@ STYLE = ("請用台灣口音的華語朗讀。你是一位溫暖、真誠的說�
 PROVIDER = "gemini" if GEMINI_KEY else "openai" if OPENAI_KEY else "edge"
 VOICE = {"gemini": f"gemini:{GEMINI_VOICE}", "openai": f"openai:{OPENAI_MODEL}:{OPENAI_VOICE}", "edge": "zh-TW-HsiaoChenNeural"}[PROVIDER]
 RATE = "-6%"
+CHUNK = int(os.environ.get("TTS_CHUNK", "1400"))  # characters per request
 _gemini_model = None
 
 pron = {k: v for k, v in json.loads((ROOT / "scripts/pronounce.json").read_text("utf-8")).items() if not k.startswith("_") and k != v}
@@ -107,7 +108,7 @@ def gemini_synth(text, path):
                 pcm = path.with_suffix(".pcm"); pcm.write_bytes(base64.b64decode(part["inlineData"]["data"]))
                 subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "s16le", "-ar", "24000", "-ac", "1", "-i", str(pcm), str(path)], check=True)
                 _gemini_model = model
-                time.sleep(float(os.environ.get("GEMINI_PACE", "4")))
+                time.sleep(float(os.environ.get("GEMINI_PACE", "21")))
                 return
             except urllib.error.HTTPError as e:
                 msg = e.read().decode(errors="ignore"); last = f"{model}: {e.code} {msg[:1500]}"
@@ -175,6 +176,31 @@ async def build(story_path, kind="story"):
         silence = td / "gap.mp3"
         subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "lavfi", "-i", "anullsrc=r=24000:cl=mono", "-t", str(GAP), "-c:a", "libmp3lame", "-b:a", "48k", str(silence)], check=True)
         files, marks, t = [], [], 0.0
+        if PROVIDER != "edge":
+            # few large requests (free tier ~10 requests/day): group segments into chunks,
+            # then spread each chunk's duration over its segments by text length
+            chunks, cur, size = [], [], 0
+            for key, text in seg:
+                if cur and size + len(text) > CHUNK:
+                    chunks.append(cur); cur, size = [], 0
+                cur.append((key, text)); size += len(text)
+            if cur: chunks.append(cur)
+            print(f"  {len(chunks)} requests")
+            try:
+                for c, chunk in enumerate(chunks):
+                    f = td / f"c{c:02d}.mp3"
+                    await synth("\n\n".join(x for _, x in chunk), f)
+                    raw = td / f"c{c:02d}r.mp3"
+                    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(f), "-ar", "24000", "-ac", "1", "-c:a", "libmp3lame", "-b:a", "48k", str(raw)], check=True)
+                    d = duration(raw); total = sum(len(x) for _, x in chunk) or 1; s0 = t
+                    for key, text in chunk:
+                        dd = d * len(text) / total
+                        marks.append({"key": key, "start": round(s0, 2), "end": round(s0 + dd, 2)}); s0 += dd
+                    files += [raw, silence]; t += d + GAP
+            except Exception as e:
+                print("  !! natural voice unavailable, keeping previous audio:", str(e)[:300])
+                return False
+            seg = []
         for k, (key, text) in enumerate(seg):
             f = td / f"{k:03d}.mp3"
             await synth(text, f)

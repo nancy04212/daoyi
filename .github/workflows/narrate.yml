@@ -4,6 +4,8 @@ on:
     branches: [main]
     paths: ["stories/*.json", "scripts/tts.py", "scripts/pronounce.json"]
   workflow_dispatch:
+  schedule:
+    - cron: "17 8 * * *"   # 16:17 台北：Google 免費額度每天 16:00 重置後，補做尚未完成的自然語音
 permissions:
   contents: write
   pages: write
