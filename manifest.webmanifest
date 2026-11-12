@@ -1,16 +1,24 @@
 {
+  "id": "/daoyi/",
   "name": "每日道義",
   "short_name": "每日道義",
-  "description": "每天一則經典、訓文故事，附逐句細解與練講工具。",
+  "description": "每天一則經典、訓文故事，附逐句細解、自然語音朗讀與練講工具。",
   "lang": "zh-Hant-TW",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "background_color": "#f7f2e8",
   "theme_color": "#a3301f",
+  "categories": ["books", "education", "lifestyle"],
   "icons": [
     {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
     {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
     {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ],
+  "shortcuts": [
+    {"name": "今日道義", "url": "./", "icons": [{"src": "icons/icon-192.png", "sizes": "192x192"}]},
+    {"name": "練講", "url": "./?v=practice", "icons": [{"src": "icons/icon-192.png", "sizes": "192x192"}]},
+    {"name": "往期", "url": "./?v=list", "icons": [{"src": "icons/icon-192.png", "sizes": "192x192"}]}
   ]
 }

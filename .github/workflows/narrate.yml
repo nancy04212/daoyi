@@ -1,0 +1,41 @@
+name: 產生朗讀音檔
+on:
+  push:
+    branches: [main]
+    paths: ["stories/*.json", "scripts/tts.py", "scripts/pronounce.json"]
+  workflow_dispatch:
+permissions:
+  contents: write
+  pages: write
+concurrency:
+  group: narrate
+  cancel-in-progress: false
+jobs:
+  narrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: 安裝工具
+        run: |
+          pip install edge-tts
+          which ffmpeg || (sudo apt-get update && sudo apt-get install -y ffmpeg)
+      - name: 產生音檔
+        run: python scripts/tts.py
+      - name: 提交音檔
+        run: |
+          git config user.name "daoyi-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add audio
+          if git diff --cached --quiet; then echo "沒有新的音檔"; exit 0; fi
+          git commit -m "朗讀音檔 $(date +%F)"
+          git pull --rebase origin main
+          git push
+          echo "PUSHED=1" >> "$GITHUB_ENV"
+      - name: 重新發布網站
+        if: env.PUSHED == '1'
+        run: |
+          curl -sS -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/${{ github.repository }}/pages/builds || true

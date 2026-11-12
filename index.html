@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-Hant" data-theme="auto" data-font="serif">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -7,8 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="每日道義">
-<meta name="theme-color" content="#f7f2e8" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#1a1714" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f7f2e8">
 <meta name="description" content="每天一則經典、訓文故事，附逐句細解與練講工具。">
 <title>每日道義</title>
 <link rel="manifest" href="manifest.webmanifest">
@@ -16,117 +15,160 @@
 <link rel="icon" type="image/png" href="icons/icon-64.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<script>
+/* apply saved reading prefs before paint (no flash) */
+(function(){try{
+  var g=function(k,d){var v=localStorage.getItem("dy:"+k);return v==null?d:JSON.parse(v)};
+  var t=g("theme","auto"), r=document.documentElement;
+  if(t==="auto") t=matchMedia("(prefers-color-scheme: dark)").matches?"night":"sepia";
+  r.dataset.theme=t; r.dataset.font=g("font","serif");
+  r.style.setProperty("--fs",g("fs",18)+"px"); r.style.setProperty("--lh",g("lh",2));
+}catch(e){document.documentElement.dataset.theme="sepia"}})();
+</script>
 <style>
+/* ============ themes ============ */
 :root{
-  --bg:#f7f2e8; --bg2:#efe7d6; --card:#fffdf8; --ink:#2a231e; --ink2:#5d5148; --mute:#968878;
-  --red:#a3301f; --red2:#c2492f; --gold:#b48a35; --line:rgba(60,40,20,.12); --fill:rgba(60,40,20,.06);
-  --fs:18px; --tabh:56px;
+  --fs:18px; --lh:2; --tabh:56px; --side:248px;
   --sans:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;
-  --serif:"Noto Serif TC","Songti TC",serif;
+  --serifF:"Noto Serif TC","Songti TC","PMingLiU",serif;
+  --red:#a3301f; --gold:#a8822f;
 }
-@media (prefers-color-scheme: dark){
-  :root{--bg:#1a1714;--bg2:#24201b;--card:#221e1a;--ink:#efe6d6;--ink2:#cbbfae;--mute:#968a7a;--red:#e0735c;--red2:#e88a74;--gold:#d8b064;--line:rgba(255,240,220,.12);--fill:rgba(255,240,220,.07);}
-}
+html[data-theme="paper"]{--bg:#ffffff;--bg2:#f4f1ec;--card:#faf8f5;--ink:#222222;--ink2:#4f4a45;--mute:#8d867e;--line:rgba(0,0,0,.1);--fill:rgba(0,0,0,.05);--mark:rgba(168,130,47,.22)}
+html[data-theme="sepia"]{--bg:#f7f2e8;--bg2:#efe7d6;--card:#fffcf6;--ink:#2e2620;--ink2:#5a4e44;--mute:#94877a;--line:rgba(70,45,20,.12);--fill:rgba(70,45,20,.06);--mark:rgba(168,130,47,.24)}
+html[data-theme="green"]{--bg:#e6eedc;--bg2:#d9e4cd;--card:#f1f6ea;--ink:#25301f;--ink2:#46533d;--mute:#7d8a72;--line:rgba(30,50,20,.13);--fill:rgba(30,50,20,.06);--mark:rgba(120,140,40,.25)}
+html[data-theme="night"]{--bg:#1b1916;--bg2:#24211d;--card:#24211d;--ink:#ddd3c3;--ink2:#b5aa99;--mute:#857a6c;--line:rgba(255,240,220,.1);--fill:rgba(255,240,220,.06);--mark:rgba(216,176,100,.22);--red:#df7a62;--gold:#d3ad62}
+html[data-font="serif"]{--read:var(--serifF)}
+html[data-font="sans"]{--read:"Noto Sans TC",var(--sans)}
+
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;background:var(--bg);color:var(--ink)}
-body{font-family:var(--sans);-webkit-font-smoothing:antialiased;overscroll-behavior-y:none}
+html,body{margin:0;background:var(--bg);color:var(--ink);transition:background .25s,color .25s}
+body{font-family:var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
 button{font-family:inherit;color:inherit;cursor:pointer;border:none;background:none;padding:0}
 a{color:inherit}
 .hidden{display:none!important}
+:focus-visible{outline:2px solid var(--red);outline-offset:2px;border-radius:6px}
 
-/* layout */
-.view{min-height:100vh;padding:calc(env(safe-area-inset-top) + 8px) 0 calc(var(--tabh) + env(safe-area-inset-bottom) + 90px)}
-.inner{max-width:680px;margin:0 auto;padding:0 20px}
-.largetitle{display:flex;align-items:flex-end;justify-content:space-between;padding:14px 0 10px}
-.largetitle h1{font-size:32px;font-weight:800;letter-spacing:.5px;margin:0}
-.largetitle .sub{font-size:13px;color:var(--mute);font-weight:600;letter-spacing:.5px;margin-bottom:2px}
-.round{width:36px;height:36px;border-radius:50%;background:var(--fill);display:grid;place-items:center}
+/* ============ shell ============ */
+.view{min-height:100vh;padding:calc(env(safe-area-inset-top) + 6px) 0 calc(var(--tabh) + env(safe-area-inset-bottom) + 96px)}
+.inner{max-width:720px;margin:0 auto;padding:0 22px}
+.largetitle{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:14px 0 12px}
+.largetitle h1{font-size:32px;font-weight:800;letter-spacing:.5px;margin:0;line-height:1.2}
+.largetitle .sub{font-size:13px;color:var(--mute);font-weight:600;letter-spacing:.5px;margin-bottom:4px}
+.tools{display:flex;gap:8px}
+.round{width:38px;height:38px;border-radius:50%;background:var(--fill);display:grid;place-items:center;font-weight:700;font-size:15px}
 .round svg{width:18px;height:18px}
+.round:hover{background:var(--line)}
 
-/* tab bar */
+/* progress */
+.progress{position:fixed;left:0;top:0;height:3px;width:0;background:var(--red);z-index:60;transition:width .1s linear}
+
+/* tab bar (mobile) */
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;height:calc(var(--tabh) + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);
-  display:flex;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-top:.5px solid var(--line)}
+  display:flex;background:color-mix(in srgb,var(--bg) 84%,transparent);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-top:.5px solid var(--line)}
+.side-head,.side-foot{display:none}
 .tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:10.5px;font-weight:600;color:var(--mute)}
-.tab svg{width:25px;height:25px}
+.tab svg{width:25px;height:25px;flex:none}
 .tab.on{color:var(--red)}
 
-/* hero */
-.hero{border-radius:22px;background:linear-gradient(160deg,#b23a26,#7a2014);color:#fff6e6;padding:22px 22px 20px;position:relative;overflow:hidden;margin:6px 0 22px;box-shadow:0 10px 30px rgba(122,32,20,.25)}
-.hero::after{content:"";position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;border:14px solid rgba(246,220,154,.18)}
-.hero .k{font-size:12px;font-weight:700;letter-spacing:2px;color:#f6dc9a;opacity:.95}
-.hero h2{font-family:var(--serif);font-size:26px;line-height:1.4;margin:8px 0 6px;font-weight:700;position:relative;z-index:1}
-.hero .src{font-size:12.5px;opacity:.8}
-.hero .acts{display:flex;gap:10px;margin-top:16px;position:relative;z-index:1}
-.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:9px 16px;font-size:14px;font-weight:700}
+/* ============ hero ============ */
+.hero{border-radius:22px;background:linear-gradient(160deg,#b23a26,#7a2014);color:#fff6e6;padding:24px 24px 22px;position:relative;overflow:hidden;margin:4px 0 8px;box-shadow:0 10px 30px rgba(122,32,20,.22)}
+.hero::after{content:"";position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;border:14px solid rgba(246,220,154,.17)}
+.hero .k{font-size:12.5px;font-weight:700;letter-spacing:2px;color:#f6dc9a}
+.hero h2{font-family:var(--serifF);font-size:clamp(23px,5.6vw,30px);line-height:1.45;margin:10px 0 8px;font-weight:700;position:relative;z-index:1;text-wrap:balance;letter-spacing:.5px}
+.hero .src{font-size:13px;opacity:.82;line-height:1.6}
+.hero .acts{display:flex;gap:10px;margin-top:18px;position:relative;z-index:1;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:9px 16px;font-size:14.5px;font-weight:700}
 .pill svg{width:16px;height:16px}
 .pill.light{background:#fff6e6;color:#8a2618}
 .pill.ghost{background:rgba(255,246,230,.16);color:#fff6e6}
+.pill:hover{filter:brightness(1.05)}
+.readmeta{display:flex;gap:14px;color:var(--mute);font-size:13px;margin:12px 2px 0}
 
-/* reading */
-.read{font-family:var(--serif);font-size:var(--fs);line-height:1.95}
-.read p{margin:0 0 1em;text-align:justify}
-.sec{margin:34px 0 14px;display:flex;align-items:center;gap:10px;font-family:var(--sans);font-size:13px;font-weight:800;letter-spacing:2px;color:var(--red)}
+/* ============ reading typography (ebook) ============ */
+.read{font-family:var(--read);font-size:var(--fs);line-height:var(--lh);color:var(--ink);
+  max-width:34em;margin:0 auto;font-feature-settings:"palt" 0;line-break:strict;word-break:normal;overflow-wrap:anywhere;hanging-punctuation:allow-end;font-kerning:none}
+.read p{margin:0 0 .85em;text-align:justify;text-justify:inter-character;text-indent:2em}
+.read p.noindent,.box p,.qa .a p,.note p{text-indent:0}
+.sec{max-width:34em;margin:2.6em auto 1.1em;display:flex;align-items:center;gap:12px;font-family:var(--sans);font-size:13px;font-weight:800;letter-spacing:3px;color:var(--red);scroll-margin-top:24px}
+.sec::before{content:"";width:18px;height:2px;background:var(--red);border-radius:2px}
 .sec::after{content:"";flex:1;height:.5px;background:var(--line)}
-.story p:first-child::first-letter{font-size:2.3em;float:left;line-height:1;margin:5px 8px 0 0;color:var(--red);font-weight:900}
-p.speaking{background:linear-gradient(transparent 58%,color-mix(in srgb,var(--gold) 30%,transparent) 58%)}
-.verse{background:var(--card);border-radius:18px;padding:18px 18px 4px;margin-bottom:16px;box-shadow:0 1px 0 var(--line),0 6px 20px rgba(60,40,20,.05)}
+p.speaking{background:linear-gradient(transparent 55%,var(--mark) 55%)}
+.box.speaking,.note.speaking,.vlines.speaking{box-shadow:0 0 0 2px var(--gold) inset;border-radius:12px}
+.note.speaking{padding-left:10px;padding-right:10px}
+.chapter{max-width:34em;margin:2em auto .4em;text-align:center}
+.chapter .orn{color:var(--gold);letter-spacing:8px;font-size:13px}
+.verse{background:var(--card);border-radius:18px;padding:20px 20px 6px;margin:0 0 18px;box-shadow:0 1px 0 var(--line),0 8px 24px rgba(60,40,20,.05)}
 .vlabel{font-family:var(--sans);font-size:12px;font-weight:700;color:var(--gold);letter-spacing:2px}
-.vlines{font-size:1.25em;font-weight:700;letter-spacing:3px;line-height:1.85;margin:6px 0 10px}
-.note{border-top:.5px solid var(--line);padding:12px 0}
-.note b{color:var(--red);display:block;font-size:.95em}
-.note div{color:var(--ink2);font-size:.93em}
-.box{background:var(--card);border-radius:16px;padding:16px 18px;margin-bottom:12px;box-shadow:0 1px 0 var(--line)}
-.box h3{font-family:var(--sans);font-size:15px;margin:0 0 6px;font-weight:800}
+.vlines{font-size:1.22em;font-weight:700;letter-spacing:.18em;line-height:1.9;margin:8px 0 12px;text-indent:0}
+.note{border-top:.5px solid var(--line);padding:14px 0 6px}
+.note b{display:inline-block;color:var(--red);font-size:.95em;margin-bottom:4px;font-family:var(--sans);font-weight:700}
+.note p{color:var(--ink2);font-size:.95em;margin-bottom:.6em}
+.box{background:var(--card);border-radius:16px;padding:18px 20px;margin:0 0 14px;box-shadow:0 1px 0 var(--line)}
+.box h3{font-family:var(--sans);font-size:15px;margin:0 0 8px;font-weight:800;letter-spacing:.5px}
+.box p{margin-bottom:.7em}
 .box p:last-child{margin-bottom:0}
 .box.accent{border-left:4px solid var(--red)}
-details.qa{background:var(--card);border-radius:16px;margin-bottom:10px;box-shadow:0 1px 0 var(--line);overflow:hidden}
-details.qa summary{list-style:none;padding:14px 16px;font-family:var(--sans);font-weight:700;font-size:15.5px;display:flex;gap:10px;align-items:flex-start}
+details.qa{background:var(--card);border-radius:16px;margin:0 0 10px;box-shadow:0 1px 0 var(--line);overflow:hidden}
+details.qa summary{list-style:none;padding:15px 18px;font-family:var(--sans);font-weight:700;font-size:16px;line-height:1.5;display:flex;gap:10px;align-items:flex-start}
 details.qa summary::-webkit-details-marker{display:none}
 details.qa summary::after{content:"";margin-left:auto;flex:none;width:9px;height:9px;border-right:2px solid var(--mute);border-bottom:2px solid var(--mute);transform:rotate(45deg);margin-top:6px;transition:.2s}
 details.qa[open] summary::after{transform:rotate(-135deg);margin-top:10px}
-details.qa .a{padding:0 16px 6px}
-.srcs{font-size:13px;color:var(--mute);line-height:1.9}
+details.qa .a{padding:0 18px 8px}
+details.qa summary:hover{background:var(--fill)}
+.srcs{font-family:var(--sans);font-size:13px;color:var(--mute);line-height:1.9}
+.pager{max-width:34em;margin:3em auto 0;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pager button{background:var(--card);border-radius:16px;padding:14px 16px;text-align:left;box-shadow:0 1px 0 var(--line);min-height:72px}
+.pager button:hover{background:var(--fill)}
+.pager button.next{text-align:right}
+.pager span{display:block;font-size:12px;color:var(--mute);font-weight:700;letter-spacing:1px;margin-bottom:4px}
+.pager b{font-family:var(--serifF);font-size:15.5px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pager button[disabled]{opacity:.35;cursor:default}
+.endmark{text-align:center;color:var(--gold);margin:2.4em 0 0;letter-spacing:10px}
 
-/* list */
+/* ============ toc (desktop right rail) ============ */
+.toc{display:none}
+.toc a{display:block;padding:6px 12px;border-left:2px solid var(--line);color:var(--mute);text-decoration:none;font-size:13.5px;line-height:1.5}
+.toc a:hover{color:var(--ink)}
+.toc a.on{color:var(--red);border-left-color:var(--red);font-weight:700}
+.toc .tt{font-size:12px;font-weight:800;letter-spacing:2px;color:var(--mute);margin:0 0 10px 14px}
+
+/* ============ list ============ */
 .chips{display:flex;gap:8px;overflow-x:auto;padding:4px 0 14px;scrollbar-width:none}
 .chips::-webkit-scrollbar{display:none}
-.chip{flex:none;padding:7px 14px;border-radius:999px;background:var(--fill);font-size:14px;font-weight:600;color:var(--ink2)}
+.chip{flex:none;padding:7px 15px;border-radius:999px;background:var(--fill);font-size:14px;font-weight:600;color:var(--ink2)}
 .chip.on{background:var(--red);color:#fff}
 .group{background:var(--card);border-radius:16px;overflow:hidden;box-shadow:0 1px 0 var(--line)}
-.row{display:flex;align-items:center;gap:14px;padding:13px 16px;border-bottom:.5px solid var(--line);width:100%;text-align:left}
+.row{display:flex;align-items:center;gap:14px;padding:14px 16px;border-bottom:.5px solid var(--line);width:100%;text-align:left}
 .row:last-child{border-bottom:none}
-.row .date{flex:none;width:44px;text-align:center;line-height:1.1}
-.row .date b{display:block;font-size:20px;font-weight:800;color:var(--red)}
+.row:hover{background:var(--fill)}
+.row .date{flex:none;width:44px;text-align:center;line-height:1.15}
+.row .date b{display:block;font-size:21px;font-weight:800;color:var(--red)}
 .row .date span{font-size:11px;color:var(--mute);font-weight:600}
 .row .t{flex:1;min-width:0}
-.row .t b{display:block;font-family:var(--serif);font-size:16.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .t b{display:block;font-family:var(--serifF);font-size:16.5px;font-weight:700;line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .row .t span{font-size:12.5px;color:var(--mute)}
 .chev{width:8px;height:8px;border-right:2px solid var(--mute);border-top:2px solid var(--mute);transform:rotate(45deg);opacity:.6;flex:none}
 
-/* segmented */
+/* ============ practice ============ */
 .seg{display:flex;background:var(--fill);border-radius:10px;padding:2px;margin:4px 0 18px}
-.seg button{flex:1;padding:7px 0;border-radius:8px;font-size:14px;font-weight:600;color:var(--ink2)}
+.seg button{flex:1;padding:8px 0;border-radius:8px;font-size:14px;font-weight:600;color:var(--ink2)}
 .seg button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.12)}
-.ctx{font-size:13px;color:var(--mute);margin:-4px 0 10px}
+.ctx{font-size:13.5px;color:var(--mute);margin:-4px 0 10px}
 .ctx b{color:var(--ink2)}
-
-/* card canvas */
 .cardwrap{border-radius:18px;overflow:hidden;box-shadow:0 12px 30px rgba(60,40,20,.18);background:var(--card)}
 .cardwrap canvas{display:block;width:100%;height:auto}
 .btnrow{display:flex;gap:10px;margin:16px 0}
 .btn{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;border-radius:14px;font-size:15.5px;font-weight:700;background:var(--fill)}
+.btn:hover{background:var(--line)}
 .btn.primary{background:var(--red);color:#fff}
+.btn.primary:hover{filter:brightness(1.07)}
 .btn svg{width:18px;height:18px}
-
-/* outline */
 .ol{display:grid;gap:10px}
-.ol .st{display:flex;gap:12px;background:var(--card);border-radius:14px;padding:14px;box-shadow:0 1px 0 var(--line)}
-.ol .badge{flex:none;width:38px;height:38px;border-radius:11px;background:var(--red);color:#fff;display:grid;place-items:center;font-family:var(--serif);font-weight:900;font-size:19px}
+.ol .st{display:flex;gap:14px;background:var(--card);border-radius:14px;padding:15px;box-shadow:0 1px 0 var(--line)}
+.ol .badge{flex:none;width:40px;height:40px;border-radius:11px;background:var(--red);color:#fff;display:grid;place-items:center;font-family:var(--serifF);font-weight:900;font-size:19px}
 .ol .tm{font-size:12px;color:var(--mute);font-weight:700}
-.ol .tx{font-size:15px;line-height:1.7}
-
-/* practice */
+.ol .tx{font-family:var(--read);font-size:15.5px;line-height:1.8}
 .timer{display:grid;place-items:center;margin:8px 0 18px}
 .ring{position:relative;width:240px;height:240px}
 .ring svg{width:100%;height:100%;transform:rotate(-90deg)}
@@ -136,140 +178,210 @@ details.qa .a{padding:0 16px 6px}
 .recbtn{width:76px;height:76px;border-radius:50%;border:4px solid var(--ink2);display:grid;place-items:center;margin:0 auto}
 .recbtn i{display:block;width:58px;height:58px;border-radius:50%;background:#e5372b;transition:.25s}
 .recbtn.on i{width:28px;height:28px;border-radius:7px}
-.lenpick{display:flex;justify-content:center;gap:8px;margin:14px 0 4px}
-.stagehint{text-align:center;font-family:var(--serif);font-size:17px;min-height:56px;padding:0 10px;color:var(--ink2)}
+.lenpick{display:flex;justify-content:center;gap:8px;margin:14px 0 4px;flex-wrap:wrap}
+.stagehint{text-align:center;font-family:var(--read);font-size:17px;line-height:1.7;min-height:60px;padding:0 10px;color:var(--ink2)}
 .stagehint b{color:var(--red)}
 .rec{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:.5px solid var(--line)}
 .rec:last-child{border-bottom:none}
 .rec .play{width:34px;height:34px;border-radius:50%;background:var(--red);color:#fff;display:grid;place-items:center;flex:none}
 .rec .play svg{width:14px;height:14px}
-.rec .meta{flex:1;font-size:14px}
+.rec .meta{flex:1;font-size:14px;min-width:0}
 .rec .meta span{display:block;font-size:12px;color:var(--mute)}
-.rec .ic{width:32px;height:32px;display:grid;place-items:center;color:var(--mute)}
+.rec .ic{width:32px;height:32px;display:grid;place-items:center;color:var(--mute);border-radius:8px}
+.rec .ic:hover{background:var(--fill)}
 .rec .ic svg{width:19px;height:19px}
-
-/* self check */
-.check{display:flex;gap:12px;align-items:flex-start;padding:13px 16px;border-bottom:.5px solid var(--line);width:100%;text-align:left}
+.check{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-bottom:.5px solid var(--line);width:100%;text-align:left}
 .check:last-child{border-bottom:none}
+.check:hover{background:var(--fill)}
 .check .bx{flex:none;width:24px;height:24px;border-radius:50%;border:2px solid var(--mute);display:grid;place-items:center;margin-top:1px;transition:.15s}
 .check.on .bx{background:var(--red);border-color:var(--red)}
 .check.on .bx::after{content:"";width:6px;height:11px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translate(-1px,-1px)}
-.check b{display:block;font-size:15.5px}
-.check span{font-size:13px;color:var(--mute)}
-textarea{width:100%;min-height:110px;border:none;border-radius:14px;background:var(--card);padding:14px;font:inherit;font-size:15.5px;color:var(--ink);box-shadow:0 1px 0 var(--line);resize:vertical}
+.check b{display:block;font-size:15.5px;line-height:1.5}
+.check span{font-size:13px;color:var(--mute);line-height:1.5}
+textarea{width:100%;min-height:110px;border:none;border-radius:14px;background:var(--card);padding:14px;font:inherit;font-size:15.5px;line-height:1.7;color:var(--ink);box-shadow:0 1px 0 var(--line);resize:vertical}
 .score{font-size:14px;color:var(--mute);text-align:right;margin:8px 2px 0}
+.prac-grid{display:block}
 
-/* settings */
+/* ============ settings ============ */
 .setrow{display:flex;align-items:center;gap:14px;padding:13px 16px;border-bottom:.5px solid var(--line);min-height:52px;width:100%;text-align:left;text-decoration:none}
 .setrow:last-child{border-bottom:none}
+a.setrow:hover,button.setrow:hover{background:var(--fill)}
 .setrow .ico{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;color:#fff;flex:none}
 .setrow .ico svg{width:18px;height:18px}
 .setrow .lbl{flex:1;font-size:16px}
 .setrow .val{color:var(--mute);font-size:15px}
 .gtitle{font-size:13px;color:var(--mute);margin:24px 16px 7px;letter-spacing:.5px}
-.gfoot{font-size:13px;color:var(--mute);margin:8px 16px 0;line-height:1.6}
-input[type=range]{width:100%;accent-color:var(--red)}
+.gfoot{font-size:13px;color:var(--mute);margin:8px 16px 0;line-height:1.65}
 
-/* mini player */
+/* reading prefs panel */
+.prefs .lab{font-size:13px;color:var(--mute);font-weight:700;letter-spacing:1px;margin:18px 2px 8px}
+.themes{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.themes button{border-radius:14px;padding:14px 0 10px;border:2px solid transparent;font-size:13px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:0 1px 0 rgba(0,0,0,.08) inset,0 0 0 1px rgba(0,0,0,.08)}
+.themes button i{font-style:normal;font-family:var(--serifF);font-size:22px;font-weight:700}
+.themes button.on{border-color:var(--red)}
+.opt{display:flex;background:var(--fill);border-radius:12px;padding:3px}
+.opt button{flex:1;padding:10px 0;border-radius:9px;font-size:15px;font-weight:600;color:var(--ink2)}
+.opt button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.sizer{display:flex;align-items:center;gap:12px;background:var(--fill);border-radius:12px;padding:6px 8px}
+.sizer button{width:44px;height:40px;border-radius:9px;font-family:var(--serifF);font-weight:700}
+.sizer button:hover{background:var(--line)}
+.sizer input{flex:1;accent-color:var(--red)}
+.preview{margin-top:16px;padding:14px 16px;border-radius:14px;background:var(--card);font-family:var(--read);font-size:var(--fs);line-height:var(--lh);text-align:justify;text-indent:2em;box-shadow:0 1px 0 var(--line)}
+input[type=range]{accent-color:var(--red)}
+
+/* ============ mini player / sheet / toast ============ */
 .player{position:fixed;left:12px;right:12px;bottom:calc(var(--tabh) + env(safe-area-inset-bottom) + 10px);z-index:29;max-width:656px;margin:0 auto;border-radius:16px;padding:10px 12px;display:flex;align-items:center;gap:12px;
-  background:color-mix(in srgb,var(--card) 88%,transparent);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 8px 30px rgba(0,0,0,.18)}
-.player img{width:40px;height:40px;border-radius:10px}
-.player .pt{flex:1;min-width:0;font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.player .pt span{display:block;font-size:12px;color:var(--mute);font-weight:500}
-.player button{width:38px;height:38px;display:grid;place-items:center}
+  background:color-mix(in srgb,var(--card) 90%,transparent);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 8px 30px rgba(0,0,0,.18)}
+.player{flex-direction:column;align-items:stretch;gap:6px}
+.prow{display:flex;align-items:center;gap:6px}
+.player img{width:40px;height:40px;border-radius:10px;margin-right:6px}
+.player .big{width:44px;height:44px;background:var(--red);color:#fff}
+.player .big:hover{background:var(--red);filter:brightness(1.08)}
+.player .big svg{width:20px;height:20px}
+.player .rate{width:auto;min-width:40px;padding:0 6px;border-radius:10px;font-size:13px;font-weight:800;color:var(--ink2)}
+.pbar{display:flex;align-items:center;gap:10px;font-size:11.5px;color:var(--mute);font-variant-numeric:tabular-nums;padding:0 4px}
+.pbar input{flex:1;height:4px;accent-color:var(--red)}
+.player.tts .aonly{display:none}
+.player .pt{flex:1;min-width:0;font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--mute)}
+.player .pt #pSub{color:var(--ink);font-size:14px}
+.player .pt span{display:block;font-size:12px;color:var(--mute);font-weight:500;overflow:hidden;text-overflow:ellipsis}
+.player button{width:38px;height:38px;display:grid;place-items:center;border-radius:50%}
+.player button:hover{background:var(--fill)}
 .player button svg{width:22px;height:22px}
-
-/* sheet & toast */
 .sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:40;opacity:0;pointer-events:none;transition:.25s}
 .sheet-bg.on{opacity:1;pointer-events:auto}
-.sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;background:var(--bg);border-radius:20px 20px 0 0;padding:10px 20px calc(24px + env(safe-area-inset-bottom));transform:translateY(105%);transition:.3s cubic-bezier(.2,.8,.2,1);max-width:680px;margin:0 auto;max-height:86vh;overflow:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;background:var(--bg);border-radius:20px 20px 0 0;padding:10px 22px calc(26px + env(safe-area-inset-bottom));transform:translateY(105%);transition:.3s cubic-bezier(.2,.8,.2,1);max-width:560px;margin:0 auto;max-height:88vh;overflow:auto;box-shadow:0 -10px 40px rgba(0,0,0,.15)}
 .sheet.on{transform:none}
 .grab{width:38px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 14px}
-.sheet h3{font-size:20px;margin:0 0 12px}
-.steps{counter-reset:s;display:grid;gap:12px;margin:0;padding:0;list-style:none}
-.steps li{counter-increment:s;display:flex;gap:12px;font-size:15.5px;line-height:1.6}
+.sheet h3{font-size:20px;margin:0 0 6px;display:flex;justify-content:space-between;align-items:center}
+.sheet .x{width:30px;height:30px;border-radius:50%;background:var(--fill);font-size:16px;color:var(--mute)}
+.steps{counter-reset:s;display:grid;gap:12px;margin:12px 0 0;padding:0;list-style:none}
+.steps li{counter-increment:s;display:flex;gap:12px;font-size:15.5px;line-height:1.65}
 .steps li::before{content:counter(s);flex:none;width:26px;height:26px;border-radius:50%;background:var(--red);color:#fff;display:grid;place-items:center;font-weight:800;font-size:14px}
-.toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 14px);transform:translate(-50%,-150%);z-index:50;background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:14px;font-weight:600;transition:.3s;white-space:nowrap}
+.kbd{display:inline-block;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:0 6px;font-size:13px;background:var(--card)}
+.toclist a{display:flex;justify-content:space-between;padding:14px 4px;border-bottom:.5px solid var(--line);text-decoration:none;font-size:16px}
+.toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 14px);transform:translate(-50%,-160%);z-index:70;background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:14px;font-weight:600;transition:.3s;white-space:nowrap}
 .toast.on{transform:translate(-50%,0)}
 .banner{display:flex;gap:12px;align-items:center;background:var(--card);border-radius:16px;padding:12px 14px;margin:4px 0 16px;box-shadow:0 1px 0 var(--line)}
 .banner img{width:42px;height:42px;border-radius:10px}
-.banner div{flex:1;font-size:14px;line-height:1.45}
+.banner div{flex:1;font-size:14px;line-height:1.5}
 .banner div b{display:block;font-size:15px}
 .banner .x{color:var(--mute);font-size:20px;width:28px}
-.empty{text-align:center;color:var(--mute);padding:60px 20px;font-size:15px}
+.empty{text-align:center;color:var(--mute);padding:60px 20px;font-size:15px;line-height:1.8}
+
+/* ============ desktop ============ */
+@media (min-width: 900px){
+  .view{padding:28px 0 120px;margin-left:var(--side)}
+  .inner{padding:0 40px;max-width:820px}
+  .tabbar{top:0;bottom:auto;right:auto;width:var(--side);height:100vh;flex-direction:column;padding:22px 14px;gap:2px;border-top:none;border-right:.5px solid var(--line);background:var(--bg2);backdrop-filter:none}
+  .side-head{display:flex;align-items:center;gap:12px;padding:4px 10px 22px}
+  .side-head img{width:40px;height:40px;border-radius:10px}
+  .side-head b{display:block;font-size:17px;letter-spacing:2px}
+  .side-head span{display:block;font-size:12px;color:var(--mute);letter-spacing:1px}
+  .tab{flex:none;flex-direction:row;justify-content:flex-start;gap:12px;padding:10px 12px;border-radius:10px;font-size:15px;color:var(--ink2)}
+  .tab svg{width:21px;height:21px}
+  .tab:hover{background:var(--fill)}
+  .tab.on{background:var(--card);color:var(--red);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  .side-foot{display:block;margin-top:auto;padding:10px}
+  .side-foot .install{width:100%;display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:12px;background:var(--red);color:#fff;font-size:14px;font-weight:700}
+  .side-foot .install svg{width:18px;height:18px}
+  .side-foot .hint{font-size:12px;color:var(--mute);margin-top:10px;line-height:1.6}
+  .player{left:calc(var(--side) + 24px);right:24px;bottom:24px}
+  .toast{top:20px}
+  .sheet{top:50%;bottom:auto;left:50%;right:auto;width:520px;border-radius:20px;transform:translate(-50%,-46%) scale(.98);opacity:0;pointer-events:none;transition:.22s;padding:22px 26px 26px}
+  .sheet.on{transform:translate(-50%,-50%);opacity:1;pointer-events:auto}
+  .grab{display:none}
+  .hero{padding:32px 34px 28px}
+  .prac-grid{display:grid;grid-template-columns:minmax(0,420px) 1fr;gap:28px;align-items:start}
+  .banner{display:none}
+}
+@media (min-width: 900px){
+  #v-read .inner{max-width:740px}
+  .read,.sec,.chapter,.pager{max-width:none}
+}
+@media (min-width: 1280px){
+  #v-read .inner{max-width:960px;display:grid;grid-template-columns:minmax(0,680px) 190px;gap:56px;justify-content:center}
+  #v-read .inner > .main{min-width:0}
+  .toc{display:block;position:sticky;top:40px;align-self:start;margin-top:120px}
+  #tocBtn{display:none}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;scroll-behavior:auto!important}}
+@media print{.tabbar,.player,.tools,.hero .acts,.pager,.toc,.progress{display:none!important}.view{margin:0;padding:0}}
 </style>
 </head>
 <body>
+<div class="progress" id="progress"></div>
 
-<!-- 今日 / 閱讀 -->
-<section class="view" id="v-read"><div class="inner" id="readInner"><div class="empty">正在展開今日的故事…</div></div></section>
+<section class="view" id="v-read"><div class="inner"><div class="main" id="readMain"><div class="empty">正在展開今日的故事…</div></div><nav class="toc" id="toc" aria-label="本則目錄"></nav></div></section>
 
-<!-- 往期 -->
 <section class="view hidden" id="v-list"><div class="inner">
   <div class="largetitle"><div><div class="sub">ARCHIVE</div><h1>往期</h1></div></div>
   <div class="chips" id="chips"></div>
   <div class="group" id="listGroup"></div>
 </div></section>
 
-<!-- 練講 -->
 <section class="view hidden" id="v-practice"><div class="inner">
   <div class="largetitle"><div><div class="sub">PRACTICE</div><h1>練講</h1></div></div>
   <div class="ctx" id="pCtx"></div>
-  <div class="seg" id="pSeg">
-    <button data-p="card" class="on">圖卡</button><button data-p="script">講稿</button><button data-p="rec">練習</button><button data-p="check">自評</button>
-  </div>
-  <div id="p-card"></div>
-  <div id="p-script" class="hidden"></div>
-  <div id="p-rec" class="hidden"></div>
-  <div id="p-check" class="hidden"></div>
+  <div class="seg" id="pSeg"><button data-p="card" class="on">圖卡</button><button data-p="script">講稿</button><button data-p="rec">練習</button><button data-p="check">自評</button></div>
+  <div id="p-card"></div><div id="p-script" class="hidden"></div><div id="p-rec" class="hidden"></div><div id="p-check" class="hidden"></div>
 </div></section>
 
-<!-- 設定 -->
 <section class="view hidden" id="v-set"><div class="inner">
   <div class="largetitle"><div><div class="sub">SETTINGS</div><h1>設定</h1></div></div>
   <div class="gtitle">閱讀</div>
   <div class="group">
-    <div class="setrow" style="flex-wrap:wrap"><div class="lbl">字體大小</div><div class="val" id="fsVal"></div><input type="range" id="fsRange" min="15" max="26" step="1"></div>
-    <div class="setrow" style="flex-wrap:wrap"><div class="lbl">朗讀速度</div><div class="val" id="rateVal"></div><input type="range" id="rateRange" min="0.6" max="1.3" step="0.05"></div>
+    <button class="setrow" id="openPrefs"><div class="ico" style="background:#5a4e44"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19 9.5 5h1L16 19M6.2 14h7.6M17 19l2.5-6.5L22 19M18 17h3"/></svg></div><div class="lbl">字體、主題與行距</div><div class="val" id="prefSummary"></div><div class="chev"></div></button>
+    <div class="setrow" style="flex-wrap:wrap"><div class="lbl">朗讀速度</div><div class="val" id="rateVal"></div><input type="range" id="rateRange" min="0.6" max="1.3" step="0.05" style="width:100%"></div>
   </div>
   <div class="gtitle">提醒</div>
   <div class="group">
-    <a class="setrow" href="daoyi.ics"><div class="ico" style="background:#e5372b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></div><div class="lbl">加入 iPhone 行事曆</div><div class="val">每天 6:30</div><div class="chev"></div></a>
+    <a class="setrow" href="daoyi.ics"><div class="ico" style="background:#e5372b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></div><div class="lbl">加入 iPhone／Mac 行事曆</div><div class="val">每天 6:30</div><div class="chev"></div></a>
   </div>
-  <div class="gfoot">點一下會開啟行事曆，選「加入全部」。建議先在行事曆 App 新增一個名為「道義」的行事曆，加入時選它，就不會和其他行程混在一起。</div>
+  <div class="gfoot">點一下會開啟行事曆，選「加入全部」。建議先新增一個名為「道義」的行事曆，加入時選它，就不會和其他行程混在一起。</div>
   <div class="gtitle">App</div>
   <div class="group">
-    <button class="setrow" id="howInstall"><div class="ico" style="background:#a3301f"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="3"/><path d="M12 18h.01"/></svg></div><div class="lbl">加到主畫面</div><div class="chev"></div></button>
-    <button class="setrow" id="refresh"><div class="ico" style="background:#b48a35"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"/></svg></div><div class="lbl">重新整理故事</div><div class="chev"></div></button>
+    <button class="setrow" id="howInstall"><div class="ico" style="background:#a3301f"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="3"/><path d="M12 18h.01"/></svg></div><div class="lbl">加到主畫面／安裝到電腦</div><div class="chev"></div></button>
+    <button class="setrow" id="refresh"><div class="ico" style="background:#a8822f"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"/></svg></div><div class="lbl">重新整理故事</div><div class="chev"></div></button>
   </div>
-  <div class="gfoot">每日故事由 Claude 撰寫，經文會先查證原典；解釋僅供參考，請以原典與前賢慈示為準。</div>
+  <div class="gfoot">電腦版快捷鍵：<span class="kbd">←</span> <span class="kbd">→</span> 切換上一則／下一則，<span class="kbd">空白鍵</span> 播放／暫停朗讀。<br>每日故事由 Claude 撰寫，經文會先查證原典；解釋僅供參考，請以原典與前賢慈示為準。</div>
 </div></section>
 
-<!-- mini player -->
 <div class="player hidden" id="player">
-  <img src="icons/icon-180.png" alt="">
-  <div class="pt" id="pTitle">朗讀中<span id="pSub"></span></div>
-  <button id="pToggle" aria-label="暫停"></button>
-  <button id="pStop" aria-label="停止"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg></button>
+  <div class="prow">
+    <img src="icons/icon-180.png" alt="">
+    <div class="pt"><span id="pKind">朗讀中</span><span id="pSub"></span></div>
+    <button id="pBack" aria-label="倒退 15 秒" class="aonly"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/><text x="12" y="15.5" font-size="7" text-anchor="middle" fill="currentColor" stroke="none" font-weight="700">15</text></svg></button>
+    <button id="pToggle" aria-label="暫停" class="big"></button>
+    <button id="pFwd" aria-label="快轉 15 秒" class="aonly"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"/><text x="12" y="15.5" font-size="7" text-anchor="middle" fill="currentColor" stroke="none" font-weight="700">15</text></svg></button>
+    <button id="pRate" class="rate" aria-label="速度">1×</button>
+    <button id="pStop" aria-label="關閉"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </div>
+  <div class="pbar aonly"><span id="pCur">0:00</span><input type="range" id="pSeek" min="0" max="100" step="0.1" value="0" aria-label="播放進度"><span id="pDur">0:00</span></div>
 </div>
 
-<nav class="tabbar">
+<nav class="tabbar" aria-label="主選單">
+  <div class="side-head"><img src="icons/icon-180.png" alt=""><div><b>每日道義</b><span>經典・訓文・練講</span></div></div>
   <button class="tab on" data-v="read"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5C10 5 7 4.5 3.5 5v13c3.5-.5 6.5 0 8.5 1.5 2-1.5 5-2 8.5-1.5V5C17 4.5 14 5 12 6.5Z"/><path d="M12 6.5v13"/></svg>今日</button>
   <button class="tab" data-v="list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/></svg>往期</button>
   <button class="tab" data-v="practice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3.5"/></svg>練講</button>
-  <button class="tab" data-v="set"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>設定</button>
+  <button class="tab" data-v="set"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>設定</button>
+  <div class="side-foot" id="sideFoot">
+    <button class="install hidden" id="installBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v12M7 10l5 5 5-5M4 19h16"/></svg>安裝到電腦</button>
+    <div class="hint" id="installHint"></div>
+  </div>
 </nav>
 
 <div class="sheet-bg" id="sheetBg"></div>
-<div class="sheet" id="sheet"><div class="grab"></div><div id="sheetBody"></div></div>
-<div class="toast" id="toast"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true"><div class="grab"></div><div id="sheetBody"></div></div>
+<div class="toast" id="toast" role="status"></div>
 
 <script>
 (() => {
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const paras = t => (Array.isArray(t) ? t : String(t || "").split(/\n+/)).filter(Boolean);
-const P = arr => paras(arr).map(x => `<p>${esc(x)}</p>`).join("");
+const paras = t => (Array.isArray(t) ? t : String(t || "").split(/\n+/)).map(x => String(x).trim()).filter(Boolean);
+const P = (arr, cls) => paras(arr).map(x => `<p${cls ? ` class="${cls}"` : ""}>${esc(x)}</p>`).join("");
 const store = {
   get(k, d){ try{ const v = localStorage.getItem("dy:"+k); return v == null ? d : JSON.parse(v); }catch(e){ return d; } },
   set(k, v){ try{ localStorage.setItem("dy:"+k, JSON.stringify(v)); }catch(e){} }
@@ -278,19 +390,54 @@ const WD = "日一二三四五六";
 const fmtDate = d => { const x = new Date(d+"T00:00:00"); return `${x.getMonth()+1}月${x.getDate()}日・星期${WD[x.getDay()]}`; };
 const isStandalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone;
 const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+const isMacSafari = !isIOS && /Macintosh/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent) && !/Chrome|Edg|Firefox/.test(navigator.userAgent);
+const isDesktop = () => matchMedia("(min-width: 900px)").matches;
 
 function toast(msg){ const t = $("#toast"); t.textContent = msg; t.classList.add("on"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("on"), 2200); }
-function sheet(html){ $("#sheetBody").innerHTML = html; $("#sheet").classList.add("on"); $("#sheetBg").classList.add("on"); }
+function sheet(html){ $("#sheetBody").innerHTML = html; $("#sheet").classList.add("on"); $("#sheetBg").classList.add("on"); $$("#sheetBody [data-close]").forEach(b => b.onclick = closeSheet); }
 function closeSheet(){ $("#sheet").classList.remove("on"); $("#sheetBg").classList.remove("on"); }
 $("#sheetBg").onclick = closeSheet;
 
-/* ---------- settings ---------- */
-let fs = store.get("fs", 18), rate = store.get("rate", 0.95);
-function applyFs(){ document.documentElement.style.setProperty("--fs", fs+"px"); $("#fsVal").textContent = fs; $("#fsRange").value = fs; }
+/* ---------- reading prefs ---------- */
+const THEMES = [["paper","白","#ffffff","#222"],["sepia","米","#f7f2e8","#2e2620"],["green","綠","#e6eedc","#25301f"],["night","夜","#1b1916","#ddd3c3"]];
+let prefs = { theme: store.get("theme","auto"), font: store.get("font","serif"), fs: store.get("fs",18), lh: store.get("lh",2) };
+let rate = store.get("rate", 0.95);
+function applyPrefs(){
+  const r = document.documentElement;
+  const t = prefs.theme === "auto" ? (matchMedia("(prefers-color-scheme: dark)").matches ? "night" : "sepia") : prefs.theme;
+  r.dataset.theme = t; r.dataset.font = prefs.font;
+  r.style.setProperty("--fs", prefs.fs+"px"); r.style.setProperty("--lh", prefs.lh);
+  const meta = document.querySelector('meta[name="theme-color"]'); meta.content = getComputedStyle(r).getPropertyValue("--bg").trim() || "#f7f2e8";
+  ["theme","font","fs","lh"].forEach(k => store.set(k, prefs[k]));
+  const tn = prefs.theme === "auto" ? "自動" : THEMES.find(x => x[0] === prefs.theme)[1];
+  $("#prefSummary").textContent = `${tn}・${prefs.font === "serif" ? "明體" : "黑體"}・${prefs.fs}`;
+}
+matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", () => prefs.theme === "auto" && applyPrefs());
+function openPrefs(){
+  const lhOpts = [[1.8,"緊湊"],[2,"標準"],[2.25,"寬鬆"]];
+  sheet(`<h3>閱讀設定<button class="x" data-close aria-label="關閉">✕</button></h3><div class="prefs">
+    <div class="lab">背景</div>
+    <div class="themes">${THEMES.map(t => `<button data-t="${t[0]}" style="background:${t[2]};color:${t[3]}" class="${prefs.theme===t[0]?"on":""}"><i>文</i>${t[1]}</button>`).join("")}</div>
+    <div class="opt" style="margin-top:10px"><button data-t="auto" class="${prefs.theme==="auto"?"on":""}">跟隨系統（白天米色、晚上夜間）</button></div>
+    <div class="lab">字型</div>
+    <div class="opt"><button data-f="serif" class="${prefs.font==="serif"?"on":""}" style="font-family:var(--serifF)">明體</button><button data-f="sans" class="${prefs.font==="sans"?"on":""}" style="font-family:'Noto Sans TC',var(--sans)">黑體</button></div>
+    <div class="lab">字級</div>
+    <div class="sizer"><button data-s="-1" style="font-size:14px" aria-label="縮小">A</button><input type="range" min="15" max="26" step="1" value="${prefs.fs}" id="fsR" aria-label="字級"><button data-s="1" style="font-size:22px" aria-label="放大">A</button></div>
+    <div class="lab">行距</div>
+    <div class="opt">${lhOpts.map(o => `<button data-l="${o[0]}" class="${prefs.lh==o[0]?"on":""}">${o[1]}</button>`).join("")}</div>
+    <div class="preview">須菩提！於意云何？可以身相見如來不？不也，世尊！不可以身相見如來。何以故？如來所說身相，即非身相。</div>
+  </div>`);
+  const re = () => { applyPrefs(); };
+  $$("#sheetBody [data-t]").forEach(b => b.onclick = () => { prefs.theme = b.dataset.t; $$("#sheetBody [data-t]").forEach(x => x.classList.toggle("on", x === b)); re(); });
+  $$("#sheetBody [data-f]").forEach(b => b.onclick = () => { prefs.font = b.dataset.f; $$("#sheetBody [data-f]").forEach(x => x.classList.toggle("on", x === b)); re(); });
+  $$("#sheetBody [data-l]").forEach(b => b.onclick = () => { prefs.lh = +b.dataset.l; $$("#sheetBody [data-l]").forEach(x => x.classList.toggle("on", x === b)); re(); });
+  $("#fsR").oninput = e => { prefs.fs = +e.target.value; re(); };
+  $$("#sheetBody [data-s]").forEach(b => b.onclick = () => { prefs.fs = Math.max(15, Math.min(26, prefs.fs + +b.dataset.s)); $("#fsR").value = prefs.fs; re(); });
+}
+$("#openPrefs").onclick = openPrefs;
 function applyRate(){ $("#rateVal").textContent = rate.toFixed(2)+"×"; $("#rateRange").value = rate; }
-$("#fsRange").oninput = e => { fs = +e.target.value; store.set("fs", fs); applyFs(); };
 $("#rateRange").oninput = e => { rate = +e.target.value; store.set("rate", rate); applyRate(); };
-applyFs(); applyRate();
+applyPrefs(); applyRate();
 
 /* ---------- data ---------- */
 let index = [], cache = {}, current = null;
@@ -312,61 +459,101 @@ function go(v){
   $$(".tab").forEach(b => b.classList.toggle("on", b.dataset.v === v));
   if(v === "list") renderList();
   if(v === "practice") renderPractice();
-  window.scrollTo(0, 0);
+  window.scrollTo(0, 0); updateProgress();
 }
 $$(".tab").forEach(b => b.onclick = () => go(b.dataset.v));
-
-async function openStory(date){
+async function openStory(date, scroll){
+  if(current && current.date !== date && mode) stopSpeak();
   current = await getStory(date);
   store.set("last", date);
+  if(location.hash.replace("#","") !== date) history.replaceState(null, "", "#"+date);
   renderRead();
+  if(scroll !== false) window.scrollTo(0, 0);
 }
 
 /* ---------- read view ---------- */
+const SECS = [];
+function textLen(s){
+  let n = 0; const add = t => paras(t).forEach(x => n += x.length);
+  add(s.story); (s.verses||[]).forEach(v => (v.notes||[]).forEach(x => add(x.text)));
+  (s.examples||[]).forEach(x => add(x.text)); (s.deeper||[]).forEach(x => add(x.a));
+  add(s.yiguandao); add(s.reflection); add(s.practice); add(s.forTeller);
+  return n;
+}
 function renderRead(){
-  const s = current, isLatest = index[0] && index[0].date === s.date;
+  const s = current, idx = index.findIndex(x => x.date === s.date), isLatest = idx === 0;
+  const prev = index[idx+1], next = index[idx-1];
+  SECS.length = 0;
+  const sec = (id, name) => { SECS.push([id, name]); return `<h2 class="sec" id="${id}">${name}</h2>`; };
+  const mins = Math.max(1, Math.round(textLen(s) / 450));
   let h = `<div class="largetitle"><div><div class="sub">${esc(fmtDate(s.date))}</div><h1>${isLatest ? "今日道義" : "往期道義"}</h1></div>
-    <button class="round" id="shareBtn" aria-label="分享"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v13M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button></div>`;
-  if(!isStandalone && !store.get("bannerX", false)){
-    h += `<div class="banner" id="banner"><img src="icons/icon-180.png" alt=""><div><b>加到主畫面</b>像 App 一樣每天打開，也能離線閱讀</div><button class="pill light" id="bannerGo" style="background:var(--red);color:#fff;padding:7px 14px">怎麼做</button><button class="x" id="bannerX">×</button></div>`;
+    <div class="tools">
+      <button class="round" id="tocBtn" aria-label="目錄"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6h12M9 12h12M9 18h12M4 6h.01M4 12h.01M4 18h.01"/></svg></button>
+      <button class="round" id="aaBtn" aria-label="閱讀設定" style="font-family:var(--serifF)">Aa</button>
+      <button class="round" id="shareBtn" aria-label="分享"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v13M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button>
+    </div></div>`;
+  if(!isStandalone && !isDesktop() && !store.get("bannerX", false)){
+    h += `<div class="banner" id="banner"><img src="icons/icon-180.png" alt=""><div><b>加到主畫面</b>像 App 一樣每天打開，也能離線閱讀</div><button class="pill" id="bannerGo" style="background:var(--red);color:#fff;padding:7px 14px">怎麼做</button><button class="x" id="bannerX" aria-label="關閉">×</button></div>`;
   }
   h += `<div class="hero"><div class="k">${esc(s.series || "經典")}${s.part ? "・"+esc(s.part) : ""}${s.no ? "　第 "+s.no+" 則" : ""}</div>
     <h2>${esc(s.title)}</h2><div class="src">${esc(s.source || "")}</div>
     <div class="acts"><button class="pill light" id="listen"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>聽故事</button>
-    <button class="pill ghost" id="toPractice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/></svg>練講</button></div></div>`;
-  h += `<div class="read">`;
-  h += `<div class="sec">故事</div><div class="story">${paras(s.story).map((p,i) => `<p data-i="${i}">${esc(p)}</p>`).join("")}</div>`;
+    <button class="pill ghost" id="toPractice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/></svg>練講</button></div></div>
+    <div class="readmeta"><span>約 ${mins} 分鐘讀完</span><span>・</span><span>${textLen(s).toLocaleString()} 字</span></div>`;
+  h += `<article class="read">`;
+  h += sec("s-story","故事") + `<div class="story">${paras(s.story).map((p,i) => `<p data-i="${i}" data-k="story-${i}">${esc(p)}</p>`).join("")}</div>`;
   if(s.verses?.length){
-    h += `<div class="sec">逐句細解</div>`;
-    s.verses.forEach(v => {
-      h += `<div class="verse"><div class="vlabel">${esc(v.label || "")}</div><div class="vlines">${(v.lines||[]).map(esc).join("<br>")}</div>`;
-      (v.notes||[]).forEach(n => h += `<div class="note"><b>「${esc(n.term)}」</b><div>${paras(n.text).map(esc).join("<br>")}</div></div>`);
+    h += sec("s-verse","逐句細解");
+    s.verses.forEach((v, vi) => {
+      h += `<div class="verse"><div class="vlabel">${esc(v.label || "")}</div><div class="vlines" data-k="verse-${vi}">${(v.lines||[]).map(esc).join("<br>")}</div>`;
+      (v.notes||[]).forEach((n, ni) => h += `<div class="note" data-k="note-${vi}-${ni}"><b>「${esc(n.term)}」</b>${P(n.text)}</div>`);
       h += `</div>`;
     });
   }
-  if(s.examples?.length){ h += `<div class="sec">生活裡的例子</div>` + s.examples.map(x => `<div class="box"><h3>${esc(x.title)}</h3>${P(x.text)}</div>`).join(""); }
-  if(s.deeper?.length){ h += `<div class="sec">為什麼？</div>` + s.deeper.map((d,i) => `<details class="qa" ${i===0?"open":""}><summary>${esc(d.q)}</summary><div class="a">${P(d.a)}</div></details>`).join(""); }
-  if(s.yiguandao){ h += `<div class="sec">與道的連結</div><div class="box accent">${P(s.yiguandao)}</div>`; }
+  if(s.examples?.length) h += sec("s-ex","生活裡的例子") + s.examples.map((x,i) => `<div class="box" data-k="ex-${i}"><h3>${esc(x.title)}</h3>${P(x.text)}</div>`).join("");
+  if(s.deeper?.length) h += sec("s-why","為什麼？") + s.deeper.map((d,i) => `<details class="qa" ${i===0?"open":""}><summary>${esc(d.q)}</summary><div class="a">${P(d.a)}</div></details>`).join("");
+  if(s.yiguandao) h += sec("s-dao","與道的連結") + `<div class="box accent">${P(s.yiguandao)}</div>`;
   if(s.reflection || s.practice){
-    h += `<div class="sec">今日帶走</div>`;
-    if(s.reflection) h += `<div class="box"><h3>省思</h3>${P(s.reflection)}</div>`;
-    if(s.practice) h += `<div class="box"><h3>今日功課</h3>${P(s.practice)}</div>`;
+    h += sec("s-take","今日帶走");
+    if(s.reflection) h += `<div class="box" data-k="take-r"><h3>省思</h3>${P(s.reflection)}</div>`;
+    if(s.practice) h += `<div class="box" data-k="take-p"><h3>今日功課</h3>${P(s.practice)}</div>`;
   }
-  if(s.forTeller){ h += `<div class="sec">給講道義的你</div><div class="box">${P(s.forTeller)}</div>`; }
-  if(s.sources?.length){ h += `<div class="sec">參考來源</div><div class="srcs">` + s.sources.map(x => /^https?:/.test(x.url||"") ? `<div>・<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.title || x.url)}</a></div>` : `<div>・${esc(x.title)}</div>`).join("") + `</div>`; }
-  h += `</div>`;
-  $("#readInner").innerHTML = h;
+  if(s.forTeller) h += sec("s-teller","給講道義的你") + `<div class="box">${P(s.forTeller)}</div>`;
+  if(s.sources?.length) h += sec("s-src","參考來源") + `<div class="srcs">` + s.sources.map(x => /^https?:/.test(x.url||"") ? `<div>・<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.title || x.url)}</a></div>` : `<div>・${esc(x.title)}</div>`).join("") + `</div>`;
+  h += `<div class="endmark">◆ ◆ ◆</div>`;
+  h += `<div class="pager"><button class="prev" ${prev?"":"disabled"} data-d="${prev?.date||""}"><span>‹ 上一則</span><b>${esc(prev?.title || "已經是第一則")}</b></button>
+        <button class="next" ${next?"":"disabled"} data-d="${next?.date||""}"><span>下一則 ›</span><b>${esc(next?.title || "已經是最新")}</b></button></div>`;
+  h += `</article>`;
+  $("#readMain").innerHTML = h;
+  $("#toc").innerHTML = `<div class="tt">本則目錄</div>` + SECS.map(([id,n]) => `<a href="#${id}" data-id="${id}">${n}</a>`).join("");
+  $$("#toc a").forEach(a => a.onclick = e => { e.preventDefault(); jump(a.dataset.id); });
   $("#listen").onclick = () => speakStory();
   $("#toPractice").onclick = () => go("practice");
+  $("#aaBtn").onclick = openPrefs;
+  $("#tocBtn").onclick = () => {
+    sheet(`<h3>本則目錄<button class="x" data-close aria-label="關閉">✕</button></h3><div class="toclist">` + SECS.map(([id,n]) => `<a href="#${id}" data-id="${id}">${n}<span class="chev" style="margin-top:8px"></span></a>`).join("") + `</div>`);
+    $$("#sheetBody .toclist a").forEach(a => a.onclick = e => { e.preventDefault(); closeSheet(); setTimeout(() => jump(a.dataset.id), 200); });
+  };
   $("#shareBtn").onclick = async () => {
-    const data = { title: s.title, text: `${s.title}｜每日道義`, url: location.href.split("#")[0] };
+    const data = { title: s.title, text: `${s.title}｜每日道義`, url: location.href };
     try{ if(navigator.share) await navigator.share(data); else { await navigator.clipboard.writeText(data.url); toast("已複製連結"); } }catch(e){}
   };
-  if($("#banner")){
-    $("#bannerX").onclick = () => { store.set("bannerX", true); $("#banner").remove(); };
-    $("#bannerGo").onclick = showInstall;
+  $$(".pager button").forEach(b => b.onclick = () => b.dataset.d && openStory(b.dataset.d));
+  if($("#banner")){ $("#bannerX").onclick = () => { store.set("bannerX", true); $("#banner").remove(); }; $("#bannerGo").onclick = showInstall; }
+  updateProgress();
+}
+function jump(id){ const el = document.getElementById(id); if(el) window.scrollTo({top: el.getBoundingClientRect().top + scrollY - 20, behavior:"smooth"}); }
+function updateProgress(){
+  const max = document.documentElement.scrollHeight - innerHeight;
+  $("#progress").style.width = view === "read" && max > 0 ? (scrollY / max * 100) + "%" : "0";
+  if(view === "read" && SECS.length){
+    let on = SECS[0][0];
+    for(const [id] of SECS){ const el = document.getElementById(id); if(el && el.getBoundingClientRect().top < innerHeight * .35) on = id; }
+    $$("#toc a").forEach(a => a.classList.toggle("on", a.dataset.id === on));
   }
 }
+addEventListener("scroll", updateProgress, {passive:true});
+addEventListener("resize", updateProgress);
 
 /* ---------- list ---------- */
 let filter = "全部";
@@ -383,50 +570,135 @@ function renderList(){
   $$("#listGroup .row").forEach(b => b.onclick = async () => { await openStory(b.dataset.d); go("read"); });
 }
 
-/* ---------- speech ---------- */
-let speaking = false, paused = false, voice = null;
-function pickVoice(){
-  const vs = speechSynthesis.getVoices();
-  voice = vs.find(v => /zh[-_]TW/i.test(v.lang) && /Mei|美佳|Premium|Enhanced/i.test(v.name)) || vs.find(v => /zh[-_]TW/i.test(v.lang)) || vs.find(v => /zh[-_]HK/i.test(v.lang)) || vs.find(v => /^zh/i.test(v.lang)) || null;
-}
-if("speechSynthesis" in window){ pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+/* ---------- listening: natural-voice audio first, browser voice as fallback ---------- */
 const ICON_PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>';
 const ICON_PLAY = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
-function markPara(i){ $$(".story p").forEach(p => p.classList.toggle("speaking", +p.dataset.i === i)); }
-function speakStory(){
+const RATES = [0.8, 1, 1.15, 1.3, 1.5];
+const audio = new Audio(); audio.preload = "metadata";
+let mode = null, marks = [], speaking = false, paused = false, voice = null, lastKey = null, seeking = false;
+let aRate = store.get("arate", 1);
+const mm = s => `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,"0")}`;
+function pickVoice(){
+  const vs = speechSynthesis.getVoices();
+  voice = vs.find(v => /zh[-_]TW/i.test(v.lang) && /Mei|美佳|Premium|Enhanced|Natural|HsiaoChen|Yating/i.test(v.name)) || vs.find(v => /zh[-_]TW/i.test(v.lang)) || vs.find(v => /^zh/i.test(v.lang)) || null;
+}
+if("speechSynthesis" in window){ pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+function highlight(key, scroll){
+  if(key === lastKey) return; lastKey = key;
+  $$("[data-k].speaking").forEach(el => el.classList.remove("speaking"));
+  if(!key) return;
+  const el = document.querySelector(`[data-k="${key}"]`);
+  if(el){ el.classList.add("speaking"); if(scroll && view === "read" && !document.hidden) el.scrollIntoView({behavior:"smooth", block:"center"}); }
+}
+function showPlayer(kind, sub, isAudio){
+  const pl = $("#player"); pl.classList.remove("hidden"); pl.classList.toggle("tts", !isAudio);
+  $("#pKind").textContent = kind; $("#pSub").textContent = " " + sub; $("#pToggle").innerHTML = ICON_PAUSE;
+  $("#pRate").textContent = (isAudio ? aRate : rate) + "×";
+}
+function setMediaSession(title, sub){
+  if(!("mediaSession" in navigator)) return;
+  navigator.mediaSession.metadata = new MediaMetadata({ title, artist: "每日道義", album: sub, artwork: [{src:"icons/icon-512.png", sizes:"512x512", type:"image/png"}] });
+  navigator.mediaSession.setActionHandler("play", () => audio.play());
+  navigator.mediaSession.setActionHandler("pause", () => audio.pause());
+  navigator.mediaSession.setActionHandler("seekbackward", () => audio.currentTime = Math.max(0, audio.currentTime - 15));
+  navigator.mediaSession.setActionHandler("seekforward", () => audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 15));
+  try{ navigator.mediaSession.setActionHandler("seekto", e => audio.currentTime = e.seekTime); }catch(e){}
+}
+async function playAudio(base, kind, title){
+  try{
+    const r = await fetch(`audio/${base}.json`, {cache:"no-cache"});
+    if(!r.ok) return false;
+    const meta = await r.json(); marks = meta.segments || [];
+  }catch(e){ return false; }
+  stopAll(); mode = "audio";
+  audio.src = `audio/${base}.mp3`; audio.playbackRate = aRate;
+  showPlayer(kind, title, true); setMediaSession(title, kind);
+  try{ await audio.play(); }catch(e){ toast("請再按一次播放"); $("#pToggle").innerHTML = ICON_PLAY; }
+  return true;
+}
+audio.addEventListener("timeupdate", () => {
+  if(mode !== "audio") return;
+  const t = audio.currentTime, d = audio.duration || 0;
+  $("#pCur").textContent = mm(t); if(d) $("#pDur").textContent = mm(d);
+  if(!seeking && d) $("#pSeek").value = t / d * 100;
+  const m = marks.find(x => t >= x.start && t < x.end + 0.7);
+  highlight(m && m.key, true);
+});
+audio.addEventListener("play", () => $("#pToggle").innerHTML = ICON_PAUSE);
+audio.addEventListener("pause", () => $("#pToggle").innerHTML = ICON_PLAY);
+audio.addEventListener("ended", () => { highlight(null); toast("聽完了 🙏"); $("#pToggle").innerHTML = ICON_PLAY; });
+$("#pSeek").addEventListener("input", () => { seeking = true; if(audio.duration) $("#pCur").textContent = mm($("#pSeek").value / 100 * audio.duration); });
+$("#pSeek").addEventListener("change", () => { if(audio.duration) audio.currentTime = $("#pSeek").value / 100 * audio.duration; seeking = false; });
+$("#pBack").onclick = () => audio.currentTime = Math.max(0, audio.currentTime - 15);
+$("#pFwd").onclick = () => audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 15);
+$("#pRate").onclick = () => {
+  if(mode === "audio"){ aRate = RATES[(RATES.indexOf(aRate) + 1) % RATES.length]; audio.playbackRate = aRate; store.set("arate", aRate); $("#pRate").textContent = aRate + "×"; }
+  else { toast("內建語音請到「設定」調整速度"); }
+};
+/* fallback: browser speech */
+function speakLines(lines, sub){
   if(!("speechSynthesis" in window)){ toast("這個瀏覽器不支援朗讀"); return; }
-  stopSpeak();
-  const s = current, lines = [{t: s.title, i: -1}];
-  paras(s.story).forEach((p,i) => lines.push({t:p, i}));
-  (s.verses||[]).forEach(v => { lines.push({t:(v.label||"")+"。"+(v.lines||[]).join(""), i:-1}); (v.notes||[]).forEach(n => lines.push({t:n.term+"。"+paras(n.text).join(""), i:-1})); });
-  speaking = true; paused = false;
-  $("#player").classList.remove("hidden"); $("#pSub").textContent = s.title; $("#pToggle").innerHTML = ICON_PAUSE;
+  stopAll(); mode = "tts"; speaking = true; paused = false;
+  showPlayer("內建語音", sub, false);
   let k = 0;
   const next = () => {
     if(!speaking) return;
-    if(k >= lines.length){ stopSpeak(); toast("聽完了 🙏"); return; }
+    if(k >= lines.length){ stopAll(); toast("聽完了 🙏"); return; }
     const L = lines[k++], u = new SpeechSynthesisUtterance(L.t);
     u.lang = "zh-TW"; if(voice) u.voice = voice; u.rate = rate;
-    u.onstart = () => { markPara(L.i); if(L.i >= 0 && view === "read"){ const el = $(`.story p[data-i="${L.i}"]`); el && el.scrollIntoView({behavior:"smooth", block:"center"}); } };
+    u.onstart = () => highlight(L.k || null, true);
     u.onend = next; u.onerror = e => { if(e.error !== "interrupted" && e.error !== "canceled") next(); };
     speechSynthesis.speak(u);
   };
   next();
 }
-function stopSpeak(){ speaking = false; paused = false; try{ speechSynthesis.cancel(); }catch(e){} $("#player").classList.add("hidden"); markPara(-9); }
-$("#pStop").onclick = stopSpeak;
-$("#pToggle").onclick = () => {
-  if(!speaking) return;
+async function speakStory(){
+  const s = current;
+  if(await playAudio(s.date, "故事朗讀", s.title)) return;
+  toast("自然語音還在製作中，先用內建語音");
+  const lines = [{t: s.title}];
+  paras(s.story).forEach((p,i) => lines.push({t:p, k:`story-${i}`}));
+  (s.verses||[]).forEach((v,vi) => { lines.push({t:(v.label||"")+"。"+(v.lines||[]).join(""), k:`verse-${vi}`}); (v.notes||[]).forEach((n,ni) => lines.push({t:n.term+"。"+paras(n.text).join(""), k:`note-${vi}-${ni}`})); });
+  speakLines(lines, s.title);
+}
+async function speakTalk(){
+  const t = talkOf(current);
+  if(await playAudio(current.date + "-talk", "示範講稿", current.title)) return;
+  speakLines(paras(t.script).map(x => ({t:x})), "示範講稿");
+}
+function stopAll(){
+  speaking = false; paused = false;
+  try{ speechSynthesis.cancel(); }catch(e){}
+  try{ audio.pause(); }catch(e){}
+  mode = null; highlight(null);
+}
+function stopSpeak(){ stopAll(); $("#player").classList.add("hidden"); }
+function togglePause(){
+  if(mode === "audio"){ audio.paused ? audio.play() : audio.pause(); return true; }
+  if(mode !== "tts" || !speaking) return false;
   if(paused){ speechSynthesis.resume(); paused = false; $("#pToggle").innerHTML = ICON_PAUSE; }
   else { speechSynthesis.pause(); paused = true; $("#pToggle").innerHTML = ICON_PLAY; }
-};
+  return true;
+}
+$("#pStop").onclick = stopSpeak;
+$("#pToggle").onclick = togglePause;
+
+/* ---------- keyboard (desktop) ---------- */
+addEventListener("keydown", e => {
+  if(e.target.closest("input,textarea") || e.metaKey || e.ctrlKey || e.altKey) return;
+  if(e.key === "Escape") return closeSheet();
+  if(view !== "read" || !current) return;
+  const i = index.findIndex(x => x.date === current.date);
+  if(e.key === "ArrowLeft" && index[i+1]){ e.preventDefault(); openStory(index[i+1].date); }
+  if(e.key === "ArrowRight" && index[i-1]){ e.preventDefault(); openStory(index[i-1].date); }
+  if(e.key === " "){ e.preventDefault(); if(!togglePause()) speakStory(); }
+});
 
 /* ---------- practice ---------- */
 let pTab = "card";
 $$("#pSeg button").forEach(b => b.onclick = () => { pTab = b.dataset.p; renderPractice(); });
 function talkOf(s){
-  if(s.talk) return s.talk;
-  return { minutes: 3, outline: [
+  return s.talk || { minutes: 3, outline: [
     {stage:"起", time:"0:00–0:30", text:"用一個生活問題開場，帶到今天的主題。"},
     {stage:"承", time:"0:30–1:30", text:"講故事：" + (s.title || "")},
     {stage:"轉", time:"1:30–2:30", text:"挑一句經文細講，配一個生活例子。"},
@@ -442,15 +714,13 @@ function renderPractice(){
   ["card","script","rec","check"].forEach(k => $("#p-"+k).classList.toggle("hidden", k !== pTab));
   ({card: renderCard, script: renderScript, rec: renderRec, check: renderCheck})[pTab]();
 }
-
-/* card */
 const logoImg = new Image(); logoImg.src = "icons/icon-180.png";
 function wrapText(ctx, text, maxW){
   const out = []; let line = "";
   for(const ch of String(text)){
     const test = line + ch;
     if(ctx.measureText(test).width > maxW && line){
-      if(/^[，。、；：！？」』）]$/.test(ch)){ line = test; continue; }
+      if(/^[，。、；：！？」』）…—]$/.test(ch)){ line = test; continue; }
       out.push(line); line = ch;
     } else line = test;
   }
@@ -460,122 +730,100 @@ function wrapText(ctx, text, maxW){
 async function drawCard(canvas, s){
   const c = cardOf(s), W = 1080, H = 1350, ctx = canvas.getContext("2d");
   canvas.width = W; canvas.height = H;
-  try{ await document.fonts.load('700 60px "Noto Serif TC"'); await document.fonts.load('900 60px "Noto Serif TC"'); }catch(e){}
+  try{ await Promise.all([document.fonts.load('700 60px "Noto Serif TC"'), document.fonts.load('900 60px "Noto Serif TC"'), document.fonts.load('500 40px "Noto Serif TC"')]); }catch(e){}
   if(!logoImg.complete) await new Promise(r => { logoImg.onload = r; logoImg.onerror = r; });
   const serif = '"Noto Serif TC","Songti TC",serif', sans = '-apple-system,"PingFang TC","Noto Sans TC",sans-serif';
-  // paper
   ctx.fillStyle = "#f7f2e8"; ctx.fillRect(0,0,W,H);
-  // top band
   const g = ctx.createLinearGradient(0,0,0,520); g.addColorStop(0,"#b23a26"); g.addColorStop(1,"#7a2014");
   ctx.fillStyle = g; ctx.fillRect(0,0,W,520);
   ctx.strokeStyle = "rgba(246,220,154,.18)"; ctx.lineWidth = 26; ctx.beginPath(); ctx.arc(W-90, 70, 230, 0, Math.PI*2); ctx.stroke();
   ctx.drawImage(logoImg, 80, 78, 84, 84);
-  ctx.fillStyle = "#f6dc9a"; ctx.font = `700 30px ${sans}`; ctx.textBaseline = "middle";
-  ctx.fillText(c.kicker || "", 186, 120);
+  ctx.fillStyle = "#f6dc9a"; ctx.font = `700 30px ${sans}`; ctx.textBaseline = "middle"; ctx.fillText(c.kicker || "", 186, 120);
   ctx.fillStyle = "#fff6e6"; ctx.textBaseline = "alphabetic";
   let fsH = 112; ctx.font = `900 ${fsH}px ${serif}`;
   while(ctx.measureText(c.headline).width > W-160 && fsH > 64){ fsH -= 6; ctx.font = `900 ${fsH}px ${serif}`; }
   const hl = wrapText(ctx, c.headline, W-160).slice(0,2);
   let y = hl.length > 1 ? 300 : 340;
   hl.forEach(l => { ctx.fillText(l, 80, y); y += fsH * 1.2; });
-  ctx.font = `600 40px ${serif}`; ctx.fillStyle = "rgba(255,246,230,.88)";
+  ctx.font = `500 40px ${serif}`; ctx.fillStyle = "rgba(255,246,230,.9)";
   wrapText(ctx, c.sub || "", W-160).slice(0,1).forEach(l => ctx.fillText(l, 80, 452));
-  // points
-  y = 620;
+  y = 624;
   (c.points || []).slice(0,3).forEach((p, i) => {
     ctx.fillStyle = "#a3301f"; ctx.beginPath(); ctx.arc(108, y-14, 28, 0, Math.PI*2); ctx.fill();
     ctx.fillStyle = "#fff"; ctx.font = `800 30px ${sans}`; ctx.textAlign = "center"; ctx.fillText(String(i+1), 108, y-3); ctx.textAlign = "left";
-    ctx.fillStyle = "#2a231e"; ctx.font = `600 42px ${serif}`;
+    ctx.fillStyle = "#2a231e"; ctx.font = `500 42px ${serif}`;
     const ls = wrapText(ctx, p, W-240).slice(0,3);
-    ls.forEach((l, j) => ctx.fillText(l, 160, y + j*62));
-    y += ls.length * 62 + 52;
+    ls.forEach((l, j) => ctx.fillText(l, 160, y + j*64));
+    y += ls.length * 64 + 50;
   });
-  // closing
   if(c.closing){
     const cy = Math.max(y + 10, 1060);
     ctx.fillStyle = "#b48a35"; ctx.fillRect(80, cy-46, 6, 100);
     ctx.fillStyle = "#7a2014"; ctx.font = `700 40px ${serif}`;
-    wrapText(ctx, c.closing, W-200).slice(0,2).forEach((l, j) => ctx.fillText(l, 112, cy + j*56));
+    wrapText(ctx, c.closing, W-200).slice(0,2).forEach((l, j) => ctx.fillText(l, 112, cy + j*58));
   }
-  // footer
   ctx.fillStyle = "rgba(42,35,30,.12)"; ctx.fillRect(80, H-120, W-160, 2);
   ctx.fillStyle = "#968878"; ctx.font = `600 28px ${sans}`;
   ctx.fillText("每日道義", 80, H-66);
   ctx.textAlign = "right"; ctx.fillText(s.date.replaceAll("-", "."), W-80, H-66); ctx.textAlign = "left";
 }
 async function renderCard(){
-  const box = $("#p-card");
-  box.innerHTML = `<div class="cardwrap"><canvas id="cv"></canvas></div>
-    <div class="btnrow"><button class="btn primary" id="cvShare"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v13M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>分享 / 儲存圖片</button></div>
-    <div class="gfoot" style="margin:0 4px">1080×1350（Instagram、LINE 直式比例）。在 iPhone 上按「分享」後選「儲存影像」即可存到相簿。</div>`;
+  $("#p-card").innerHTML = `<div class="prac-grid"><div class="cardwrap"><canvas id="cv"></canvas></div><div>
+    <div class="btnrow" style="margin-top:0"><button class="btn primary" id="cvShare"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v13M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>${isDesktop() ? "下載圖片" : "分享／儲存圖片"}</button></div>
+    <div class="gfoot" style="margin:0 4px">1080×1350（Instagram、LINE 直式比例）。在 iPhone 上按「分享」後選「儲存影像」即可存到相簿；電腦上會直接下載 PNG。</div></div></div>`;
   const cv = $("#cv"); await drawCard(cv, current);
   $("#cvShare").onclick = () => cv.toBlob(async blob => {
     const file = new File([blob], `每日道義-${current.date}.png`, {type:"image/png"});
     try{
-      if(navigator.canShare && navigator.canShare({files:[file]})) await navigator.share({files:[file], title: current.title});
-      else { const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = file.name; a.click(); }
+      if(!isDesktop() && navigator.canShare && navigator.canShare({files:[file]})) await navigator.share({files:[file], title: current.title});
+      else { const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = file.name; a.click(); toast("已下載圖片"); }
     }catch(e){}
   }, "image/png");
 }
-
-/* script */
 function renderScript(){
   const t = talkOf(current);
-  let h = `<div class="sec" style="margin-top:4px">${t.minutes || 3} 分鐘架構</div><div class="ol">` +
+  let left = `<div class="sec" style="margin:4px 0 14px;max-width:none">${t.minutes || 3} 分鐘架構</div><div class="ol">` +
     (t.outline||[]).map(o => `<div class="st"><div class="badge">${esc(o.stage)}</div><div><div class="tm">${esc(o.time||"")}</div><div class="tx">${esc(o.text)}</div></div></div>`).join("") + `</div>`;
-  if(t.script) h += `<div class="sec">示範講稿</div><div class="box read">${P(t.script)}</div><div class="btnrow"><button class="btn" id="readScript"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>聽示範</button><button class="btn" id="copyScript"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>複製講稿</button></div>`;
-  if(t.questions?.length) h += `<div class="sec">求道人可能會問</div>` + t.questions.map(q => `<details class="qa"><summary>${esc(q.q)}</summary><div class="a read" style="font-size:16px">${P(q.a)}</div></details>`).join("");
-  if(t.pitfalls?.length) h += `<div class="sec">容易講錯的地方</div><div class="box">` + t.pitfalls.map(p => `<p>⚠︎ ${esc(p)}</p>`).join("") + `</div>`;
-  $("#p-script").innerHTML = h;
+  if(t.pitfalls?.length) left += `<div class="sec" style="max-width:none">容易講錯的地方</div><div class="box">` + t.pitfalls.map(p => `<p>⚠︎ ${esc(p)}</p>`).join("") + `</div>`;
+  let right = "";
+  if(t.script) right += `<div class="sec" style="margin:4px 0 14px;max-width:none">示範講稿</div><div class="box read" style="max-width:none">${P(t.script)}</div><div class="btnrow"><button class="btn" id="readScript"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>聽示範</button><button class="btn" id="copyScript"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>複製講稿</button></div>`;
+  if(t.questions?.length) right += `<div class="sec" style="max-width:none">求道人可能會問</div>` + t.questions.map(q => `<details class="qa"><summary>${esc(q.q)}</summary><div class="a read" style="font-size:16px;max-width:none">${P(q.a)}</div></details>`).join("");
+  $("#p-script").innerHTML = `<div class="prac-grid" style="grid-template-columns:minmax(0,1fr) minmax(0,1.3fr)"><div>${left}</div><div>${right}</div></div>`;
   if($("#copyScript")) $("#copyScript").onclick = async () => { try{ await navigator.clipboard.writeText(paras(t.script).join("\n")); toast("已複製講稿"); }catch(e){ toast("複製失敗"); } };
-  if($("#readScript")) $("#readScript").onclick = () => {
-    stopSpeak(); speaking = true; $("#player").classList.remove("hidden"); $("#pSub").textContent = "示範講稿"; $("#pToggle").innerHTML = ICON_PAUSE;
-    const ls = paras(t.script); let k = 0;
-    const next = () => { if(!speaking) return; if(k >= ls.length) return stopSpeak(); const u = new SpeechSynthesisUtterance(ls[k++]); u.lang = "zh-TW"; if(voice) u.voice = voice; u.rate = rate; u.onend = next; speechSynthesis.speak(u); };
-    next();
-  };
+  if($("#readScript")) $("#readScript").onclick = speakTalk;
 }
-
-/* recording (IndexedDB) */
 const idb = (() => {
   let dbp;
   const open = () => dbp || (dbp = new Promise((res, rej) => { const r = indexedDB.open("daoyi", 1); r.onupgradeneeded = () => r.result.createObjectStore("recs", {keyPath:"id"}); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }));
-  const tx = async (mode, fn) => { const db = await open(); return new Promise((res, rej) => { const t = db.transaction("recs", mode); const st = t.objectStore("recs"); const out = fn(st); t.oncomplete = () => res(out && out.result); t.onerror = () => rej(t.error); }); };
+  const tx = async (mode, fn) => { const db = await open(); return new Promise((res, rej) => { const t = db.transaction("recs", mode); const out = fn(t.objectStore("recs")); t.oncomplete = () => res(out && out.result); t.onerror = () => rej(t.error); }); };
   return { put: r => tx("readwrite", st => st.put(r)), del: id => tx("readwrite", st => st.delete(id)), all: () => tx("readonly", st => st.getAll()) };
 })();
 let rec = null, recChunks = [], recStart = 0, recTimer = null, targetMin = null, audioEl = null;
 const mmss = s => `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,"0")}`;
-function stageAt(sec, t){
-  const total = (targetMin || t.minutes || 3) * 60, ol = t.outline || [], n = ol.length || 1;
-  const i = Math.min(n-1, Math.floor(sec / (total / n)));
-  return ol[i];
-}
+function stageAt(sec, t){ const total = (targetMin || t.minutes || 3) * 60, ol = t.outline || [], n = ol.length || 1; return ol[Math.min(n-1, Math.floor(sec / (total / n)))]; }
 async function renderRec(){
   const t = talkOf(current); if(targetMin == null) targetMin = t.minutes || 3;
-  const box = $("#p-rec");
-  box.innerHTML = `
+  $("#p-rec").innerHTML = `<div class="prac-grid"><div>
     <div class="timer"><div class="ring"><svg viewBox="0 0 240 240"><circle cx="120" cy="120" r="108" fill="none" stroke="var(--fill)" stroke-width="12"/><circle id="arc" cx="120" cy="120" r="108" fill="none" stroke="var(--red)" stroke-width="12" stroke-linecap="round" stroke-dasharray="678.6" stroke-dashoffset="678.6"/></svg>
       <div class="num"><b id="tNum">0:00</b><span id="tSub">目標 ${targetMin} 分鐘</span></div></div></div>
     <div class="stagehint" id="stageHint">按下紅色按鈕開始錄音與計時<br><span style="font-size:14px;color:var(--mute)">會依「起承轉合」提示你講到哪一段</span></div>
     <button class="recbtn" id="recBtn" aria-label="錄音"><i></i></button>
-    <div class="lenpick">${[1,3,5,10].map(m => `<button class="chip ${m===targetMin?"on":""}" data-m="${m}">${m} 分鐘</button>`).join("")}</div>
-    <div class="sec">我的錄音</div><div class="group" id="recList"><div class="empty" style="padding:24px">還沒有錄音</div></div>
-    <div class="gfoot" style="margin:10px 4px">想要更具體的回饋？按錄音旁的分享，把檔案傳到 Claude App，貼上「自評」頁裡的提示詞，就能得到逐段建議。錄音只存在這支手機裡。</div>`;
+    <div class="lenpick">${[1,3,5,10].map(m => `<button class="chip ${m===targetMin?"on":""}" data-m="${m}">${m} 分鐘</button>`).join("")}</div></div>
+    <div><div class="sec" style="max-width:none">我的錄音</div><div class="group" id="recList"><div class="empty" style="padding:24px">還沒有錄音</div></div>
+    <div class="gfoot" style="margin:10px 4px">想要更具體的回饋？按錄音旁的分享（電腦上是下載），把檔案傳到 Claude，貼上「自評」頁裡的提示詞，就能得到逐段建議。錄音只存在這台裝置裡。</div></div></div>`;
   $$(".lenpick .chip").forEach(b => b.onclick = () => { if(rec) return; targetMin = +b.dataset.m; renderRec(); });
   $("#recBtn").onclick = () => rec ? stopRec() : startRec();
   listRecs();
 }
 async function startRec(){
   if(!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder){ toast("這個瀏覽器不支援錄音"); return; }
-  let stream;
-  try{ stream = await navigator.mediaDevices.getUserMedia({audio:true}); }catch(e){ toast("需要允許使用麥克風"); return; }
+  let stream; try{ stream = await navigator.mediaDevices.getUserMedia({audio:true}); }catch(e){ toast("需要允許使用麥克風"); return; }
   const type = ["audio/mp4","audio/webm;codecs=opus","audio/webm"].find(t => MediaRecorder.isTypeSupported(t)) || "";
   rec = new MediaRecorder(stream, type ? {mimeType:type} : undefined); recChunks = [];
   rec.ondataavailable = e => e.data.size && recChunks.push(e.data);
   rec.onstop = async () => {
     stream.getTracks().forEach(t => t.stop());
-    const dur = (Date.now() - recStart) / 1000, blob = new Blob(recChunks, {type: rec.mimeType || type || "audio/mp4"});
-    rec = null;
+    const dur = (Date.now() - recStart) / 1000, blob = new Blob(recChunks, {type: rec.mimeType || type || "audio/mp4"}); rec = null;
     await idb.put({ id: Date.now(), date: current.date, title: current.title, dur, blob, type: blob.type });
     toast(`已存檔・${mmss(dur)}`); listRecs();
   };
@@ -586,8 +834,7 @@ async function startRec(){
     arc.style.strokeDashoffset = 678.6 * (1 - Math.min(1, sec/total));
     arc.style.stroke = sec > total ? "#e5372b" : sec > total*0.85 ? "var(--gold)" : "var(--red)";
     $("#tSub").textContent = sec > total ? `超時 ${mmss(sec-total)}` : `剩 ${mmss(total-sec)}`;
-    const st = stageAt(sec, t);
-    if(st) $("#stageHint").innerHTML = `<b>${esc(st.stage)}</b>｜${esc(st.text)}`;
+    const st = stageAt(sec, t); if(st) $("#stageHint").innerHTML = `<b>${esc(st.stage)}</b>｜${esc(st.text)}`;
   }, 250);
 }
 function stopRec(){ clearInterval(recTimer); $("#recBtn")?.classList.remove("on"); try{ rec.stop(); }catch(e){} }
@@ -596,7 +843,7 @@ async function listRecs(){
   const el = $("#recList"); if(!el) return;
   if(!all.length){ el.innerHTML = `<div class="empty" style="padding:24px">還沒有錄音</div>`; return; }
   el.innerHTML = all.map(r => { const d = new Date(r.id); return `<div class="rec" data-id="${r.id}">
-    <button class="play" data-a="play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
+    <button class="play" data-a="play" aria-label="播放">${ICON_PLAY}</button>
     <div class="meta">${esc(r.title)}<span>${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}・${mmss(r.dur)}</span></div>
     <button class="ic" data-a="share" aria-label="分享"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v13M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button>
     <button class="ic" data-a="del" aria-label="刪除"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button></div>`; }).join("");
@@ -605,21 +852,18 @@ async function listRecs(){
     row.querySelector('[data-a="play"]').onclick = e => {
       const btn = e.currentTarget;
       if(audioEl && audioEl._id === r.id && !audioEl.paused){ audioEl.pause(); btn.innerHTML = ICON_PLAY; return; }
-      if(audioEl){ audioEl.pause(); }
+      if(audioEl) audioEl.pause();
       $$("#recList .play").forEach(b => b.innerHTML = ICON_PLAY);
       audioEl = new Audio(URL.createObjectURL(r.blob)); audioEl._id = r.id; audioEl.play().catch(()=>{});
       btn.innerHTML = ICON_PAUSE; audioEl.onended = () => btn.innerHTML = ICON_PLAY;
     };
     row.querySelector('[data-a="share"]').onclick = async () => {
-      const ext = /webm/.test(r.type) ? "webm" : "m4a";
-      const file = new File([r.blob], `練講-${r.date}-${r.id}.${ext}`, {type: r.type});
-      try{ if(navigator.canShare && navigator.canShare({files:[file]})) await navigator.share({files:[file]}); else { const a = document.createElement("a"); a.href = URL.createObjectURL(r.blob); a.download = file.name; a.click(); } }catch(e){}
+      const ext = /webm/.test(r.type) ? "webm" : "m4a", file = new File([r.blob], `練講-${r.date}-${r.id}.${ext}`, {type: r.type});
+      try{ if(!isDesktop() && navigator.canShare && navigator.canShare({files:[file]})) await navigator.share({files:[file]}); else { const a = document.createElement("a"); a.href = URL.createObjectURL(r.blob); a.download = file.name; a.click(); } }catch(e){}
     };
-    row.querySelector('[data-a="del"]').onclick = async () => { await idb.del(r.id); listRecs(); };
+    row.querySelector('[data-a="del"]').onclick = async () => { await idb.del(r.id); listRecs(); toast("已刪除"); };
   });
 }
-
-/* self-check */
 const CHECKS = [
   ["開場 30 秒內抓住注意", "用問題、畫面或故事，而不是「今天要講的是…」"],
   ["故事講得出場景與人物", "有時間、地點、對話，聽的人看得到畫面"],
@@ -632,13 +876,12 @@ const CHECKS = [
 ];
 function renderCheck(){
   const key = "check:" + current.date, st = store.get(key, {on: [], note: ""});
-  const box = $("#p-check");
-  box.innerHTML = `<div class="group">` + CHECKS.map((c,i) => `<button class="check ${st.on.includes(i)?"on":""}" data-i="${i}"><div class="bx"></div><div><b>${c[0]}</b><span>${c[1]}</span></div></button>`).join("") + `</div>
-    <div class="score" id="score"></div>
-    <div class="sec">這次想改進的地方</div><textarea id="note" placeholder="例如：轉折太突然、例子可以換成…">${esc(st.note)}</textarea>
-    <div class="sec">請 Claude 給回饋</div>
-    <div class="box"><p style="font-size:15px;margin-bottom:10px">把錄音（或講稿）傳到 Claude App，貼上這段提示詞：</p>
-    <button class="btn primary" id="copyPrompt" style="width:100%"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>複製回饋提示詞</button></div>`;
+  $("#p-check").innerHTML = `<div class="prac-grid" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr)"><div><div class="group">` + CHECKS.map((c,i) => `<button class="check ${st.on.includes(i)?"on":""}" data-i="${i}"><div class="bx"></div><div><b>${c[0]}</b><span>${c[1]}</span></div></button>`).join("") + `</div>
+    <div class="score" id="score"></div></div><div>
+    <div class="sec" style="margin-top:4px;max-width:none">這次想改進的地方</div><textarea id="note" placeholder="例如：轉折太突然、例子可以換成…">${esc(st.note)}</textarea>
+    <div class="sec" style="max-width:none">請 Claude 給回饋</div>
+    <div class="box"><p style="font-size:15px;margin-bottom:12px">把錄音（或講稿）傳到 Claude，貼上這段提示詞：</p>
+    <button class="btn primary" id="copyPrompt" style="width:100%"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>複製回饋提示詞</button></div></div></div>`;
   const upd = () => { $("#score").textContent = `完成 ${st.on.length} / ${CHECKS.length}`; store.set(key, st); };
   $$("#p-check .check").forEach(b => b.onclick = () => { const i = +b.dataset.i; st.on = st.on.includes(i) ? st.on.filter(x => x!==i) : [...st.on, i]; b.classList.toggle("on"); upd(); });
   $("#note").oninput = e => { st.note = e.target.value; store.set(key, st); };
@@ -649,30 +892,48 @@ function renderCheck(){
   upd();
 }
 
-/* ---------- install guide ---------- */
-function showInstall(){
-  sheet(isIOS ? `<h3>加到主畫面</h3><ol class="steps">
-      <li>用 <b>Safari</b> 打開這個網頁（其他 App 內建的瀏覽器不行）</li>
-      <li>點下方的「分享」按鈕 <span style="display:inline-block;border:1.5px solid currentColor;border-radius:4px;padding:0 5px;font-size:12px">↑</span></li>
-      <li>往下滑，選「<b>加入主畫面</b>」</li>
-      <li>名稱已經是「每日道義」，按右上角「加入」</li></ol>
-      <p class="gfoot" style="margin:16px 0 0">之後從主畫面打開會是全螢幕，像一般 App 一樣，看過的故事也能離線閱讀。</p>`
-    : `<h3>加到主畫面</h3><ol class="steps"><li>用 Chrome 打開這個網頁</li><li>點右上角「⋮」選單</li><li>選「<b>加到主畫面</b>」或「安裝應用程式」</li></ol>`);
+/* ---------- install ---------- */
+let deferredPrompt = null;
+addEventListener("beforeinstallprompt", e => { e.preventDefault(); deferredPrompt = e; $("#installBtn").classList.remove("hidden"); $("#installHint").textContent = "安裝後會出現在桌面、開始選單或 Dock，可以釘選到工具列。"; });
+addEventListener("appinstalled", () => { deferredPrompt = null; $("#installBtn").classList.add("hidden"); $("#installHint").textContent = ""; toast("已安裝 🙏"); });
+$("#installBtn").onclick = async () => { if(!deferredPrompt) return showInstall(); deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; };
+if(isDesktop() && !isStandalone){
+  setTimeout(() => { if(!deferredPrompt){ $("#installHint").innerHTML = isMacSafari ? "Safari：選單「檔案」→「加入 Dock」，就能像 App 一樣從 Dock 打開。" : `<a href="#" id="hintLink" style="color:var(--red);font-weight:700;text-decoration:none">如何安裝到電腦 ›</a>`; const l = $("#hintLink"); if(l) l.onclick = e => { e.preventDefault(); showInstall(); }; } }, 1500);
 }
-$("#howInstall").onclick = showInstall;
+function showInstall(){
+  if(isDesktop()){
+    sheet(`<h3>安裝到電腦<button class="x" data-close aria-label="關閉">✕</button></h3>
+      <div class="lab" style="font-size:13px;color:var(--mute);font-weight:700;margin:14px 0 4px">Chrome／Edge（Windows、Mac）</div>
+      <ol class="steps"><li>點網址列最右邊的「安裝」圖示 <span class="kbd">⊕</span>（或選單 ⋮ →「投放、儲存與分享」→「將網頁安裝為應用程式」）</li><li>按「安裝」，會出現獨立視窗，並加到桌面與開始選單</li><li>Windows：在工作列的圖示上按右鍵 →「釘選到工作列」；Mac：在 Dock 圖示按右鍵 →「選項」→「保留在 Dock」</li></ol>
+      <div class="lab" style="font-size:13px;color:var(--mute);font-weight:700;margin:18px 0 4px">Mac Safari</div>
+      <ol class="steps"><li>選單列「檔案」→「加入 Dock」</li><li>按「加入」，Dock 就會出現「每日道義」</li></ol>
+      <div class="lab" style="font-size:13px;color:var(--mute);font-weight:700;margin:18px 0 4px">只想加到書籤列</div>
+      <ol class="steps"><li>按 <span class="kbd">Ctrl</span>＋<span class="kbd">D</span>（Mac 是 <span class="kbd">⌘</span>＋<span class="kbd">D</span>），位置選「書籤列」</li></ol>`);
+  } else {
+    sheet(isIOS ? `<h3>加到主畫面<button class="x" data-close aria-label="關閉">✕</button></h3><ol class="steps">
+        <li>用 <b>Safari</b> 打開這個網頁（LINE 等 App 內建的瀏覽器不行）</li>
+        <li>點下方的「分享」按鈕 <span class="kbd">↑</span></li>
+        <li>往下滑，選「<b>加入主畫面</b>」</li>
+        <li>名稱已經是「每日道義」，按右上角「加入」</li></ol>
+        <p class="gfoot" style="margin:16px 0 0">之後從主畫面打開會是全螢幕，看過的故事也能離線閱讀。</p>`
+      : `<h3>加到主畫面<button class="x" data-close aria-label="關閉">✕</button></h3><ol class="steps"><li>用 Chrome 打開這個網頁</li><li>點右上角「⋮」選單</li><li>選「<b>加到主畫面</b>」或「安裝應用程式」</li></ol>`);
+  }
+}
+$("#howInstall").onclick = () => deferredPrompt ? $("#installBtn").click() : showInstall();
 $("#refresh").onclick = async () => { await boot(true); toast("已更新"); go("read"); };
 
 /* ---------- boot ---------- */
 async function boot(force){
   try{
     await loadIndex(force);
-    if(!index.length){ $("#readInner").innerHTML = `<div class="empty">第一則故事正在準備中</div>`; return; }
+    if(!index.length){ $("#readMain").innerHTML = `<div class="empty">第一則故事正在準備中</div>`; return; }
     if(force) cache = {};
     const h = location.hash.replace("#", "");
-    const target = index.find(x => x.date === h) ? h : index[0].date;
-    await openStory(target);
+    await openStory(index.find(x => x.date === h) ? h : index[0].date);
+    const v = new URLSearchParams(location.search).get("v");
+    if(["list","practice","set"].includes(v)) go(v);
   }catch(e){
-    $("#readInner").innerHTML = `<div class="empty">讀不到故事，請確認網路後重新整理。</div>`;
+    $("#readMain").innerHTML = `<div class="empty">讀不到故事，請確認網路後重新整理。</div>`;
   }
 }
 boot(false);
