@@ -5,13 +5,25 @@ writes audio/YYYY-MM-DD.mp3 and audio/YYYY-MM-DD.json (segment start times, so
 the app can highlight the paragraph being read). Skips stories whose narration
 text has not changed.
 """
-import asyncio, hashlib, json, pathlib, re, subprocess, sys, tempfile
-import edge_tts
+import asyncio, base64, hashlib, json, os, pathlib, re, subprocess, sys, tempfile, time, urllib.request, urllib.error
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-VOICE = "zh-TW-HsiaoChenNeural"
-RATE = "-6%"
 GAP = 0.7  # seconds of silence between paragraphs
+
+# --- voice provider: Gemini (most natural) > OpenAI > Edge (free fallback) ---
+GEMINI_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
+OPENAI_KEY = os.environ.get("OPENAI_API_KEY", "").strip()
+GEMINI_MODELS = [m for m in [os.environ.get("GEMINI_TTS_MODEL", "").strip(), "gemini-3.8-flash-tts", "gemini-3.8-flash-tts-preview", "gemini-3.1-flash-tts-preview", "gemini-2.5-flash-preview-tts"] if m]
+GEMINI_VOICE = os.environ.get("GEMINI_VOICE", "Sulafat").strip() or "Sulafat"
+OPENAI_MODEL = os.environ.get("OPENAI_TTS_MODEL", "gpt-4o-mini-tts").strip()
+OPENAI_VOICE = os.environ.get("OPENAI_VOICE", "marin").strip()
+STYLE = ("請用台灣口音的華語朗讀。你是一位溫暖、真誠的說書人，像在和好朋友分享一段很有感觸的故事："
+         "語氣自然、有抑揚頓挫，句子之間有適當的停頓，講到對話時帶一點人物的情緒，講到道理時放慢、篤定。"
+         "不要像播報新聞，也不要過度誇張。只唸出內容本身。")
+PROVIDER = "gemini" if GEMINI_KEY else "openai" if OPENAI_KEY else "edge"
+VOICE = {"gemini": f"gemini:{GEMINI_VOICE}", "openai": f"openai:{OPENAI_MODEL}:{OPENAI_VOICE}", "edge": "zh-TW-HsiaoChenNeural"}[PROVIDER]
+RATE = "-6%"
+_gemini_model = None
 
 pron = {k: v for k, v in json.loads((ROOT / "scripts/pronounce.json").read_text("utf-8")).items() if not k.startswith("_") and k != v}
 keys = sorted(pron, key=len, reverse=True)
@@ -68,10 +80,58 @@ def duration(path):
     out = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", str(path)], capture_output=True, text=True).stdout
     return float(out.strip() or 0)
 
+def _post(url, body, headers):
+    req = urllib.request.Request(url, data=json.dumps(body).encode(), headers={"Content-Type": "application/json", **headers})
+    with urllib.request.urlopen(req, timeout=180) as r:
+        return r.read()
+
+def gemini_synth(text, path):
+    global _gemini_model
+    models = [_gemini_model] if _gemini_model else GEMINI_MODELS
+    last = None
+    for model in models:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={GEMINI_KEY}"
+        body = {"contents": [{"parts": [{"text": STYLE + "\n\n" + text}]}],
+                "generationConfig": {"responseModalities": ["AUDIO"],
+                                     "speechConfig": {"voiceConfig": {"prebuiltVoiceConfig": {"voiceName": GEMINI_VOICE}}}}}
+        for attempt in range(6):
+            try:
+                data = json.loads(_post(url, body, {}))
+                part = next(p for p in data["candidates"][0]["content"]["parts"] if "inlineData" in p)
+                pcm = path.with_suffix(".pcm"); pcm.write_bytes(base64.b64decode(part["inlineData"]["data"]))
+                subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "s16le", "-ar", "24000", "-ac", "1", "-i", str(pcm), str(path)], check=True)
+                _gemini_model = model
+                return
+            except urllib.error.HTTPError as e:
+                msg = e.read().decode(errors="ignore")[:300]; last = f"{model}: {e.code} {msg}"
+                if e.code in (404, 400) and ("not found" in msg.lower() or "not supported" in msg.lower() or e.code == 404):
+                    print("  model unavailable:", model); break
+                wait = 20 * (attempt + 1) if e.code == 429 else 5
+                print(f"  {e.code}, retry in {wait}s"); time.sleep(wait)
+            except Exception as e:
+                last = f"{model}: {e}"; print("  retry", e); time.sleep(5)
+    raise RuntimeError("Gemini TTS failed: " + str(last))
+
+def openai_synth(text, path):
+    body = {"model": OPENAI_MODEL, "voice": OPENAI_VOICE, "input": text, "instructions": STYLE, "response_format": "mp3"}
+    for attempt in range(5):
+        try:
+            path.write_bytes(_post("https://api.openai.com/v1/audio/speech", body, {"Authorization": f"Bearer {OPENAI_KEY}"}))
+            return
+        except urllib.error.HTTPError as e:
+            print("  openai", e.code, e.read()[:200]); time.sleep(10 * (attempt + 1))
+    raise RuntimeError("OpenAI TTS failed")
+
 async def synth(text, path):
+    spoken = speakable(text)
+    if PROVIDER == "gemini":
+        return await asyncio.to_thread(gemini_synth, spoken, path)
+    if PROVIDER == "openai":
+        return await asyncio.to_thread(openai_synth, spoken, path)
+    import edge_tts
     for attempt in range(3):
         try:
-            await edge_tts.Communicate(speakable(text), VOICE, rate=RATE).save(str(path))
+            await edge_tts.Communicate(spoken, VOICE, rate=RATE).save(str(path))
             if path.stat().st_size > 0:
                 return
         except Exception as e:
@@ -95,7 +155,7 @@ async def build(story_path, kind="story"):
     meta_path = out_base.with_suffix(".json")
     if meta_path.exists() and json.loads(meta_path.read_text("utf-8")).get("hash") == digest and out_base.with_suffix(".mp3").exists():
         return False
-    print(f"narrating {date} ({kind}): {len(seg)} segments")
+    print(f"narrating {date} ({kind}) with {VOICE}: {len(seg)} segments")
     with tempfile.TemporaryDirectory() as td:
         td = pathlib.Path(td)
         silence = td / "gap.mp3"
@@ -113,7 +173,7 @@ async def build(story_path, kind="story"):
         lst = td / "list.txt"
         lst.write_text("".join(f"file '{p}'\n" for p in files))
         subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", str(lst), "-c:a", "libmp3lame", "-b:a", "48k", "-ar", "24000", "-ac", "1", str(out_base.with_suffix(".mp3"))], check=True)
-    meta_path.write_text(json.dumps({"hash": digest, "voice": VOICE, "duration": round(t - GAP, 2), "segments": marks}, ensure_ascii=False), "utf-8")
+    meta_path.write_text(json.dumps({"hash": digest, "voice": VOICE, "provider": PROVIDER, "duration": round(t - GAP, 2), "segments": marks}, ensure_ascii=False), "utf-8")
     return True
 
 async def main():
