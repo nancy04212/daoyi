@@ -54,6 +54,8 @@ def segments(s):
             seg.append((f"verse-{vi}", (v.get("label", "") + "。" if v.get("label") else "") + "".join(v.get("lines", []))))
             for ni, n in enumerate(v.get("notes", [])):
                 seg.append((f"note-{vi}-{ni}", n.get("term", "") + "。" + "".join(paras(n.get("text")))))
+    if s.get("yiguandao"):
+        seg.append(("dao", "與道的連結。" + "".join(paras(s["yiguandao"]))))
     m = s.get("modern") or {}
     if m:
         seg.append(("", "這段話，放到今天怎麼看？"))
@@ -72,9 +74,6 @@ def segments(s):
         seg.append(("take-r", "今天的省思。" + "".join(paras(s["reflection"]))))
     if s.get("practice"):
         seg.append(("take-p", "今天的功課。" + "".join(paras(s["practice"]))))
-    ch = s.get("challenge") or {}
-    if ch:
-        seg.append(("challenge", "最後，今天的實踐挑戰：" + ch.get("title", "") + "。" + "".join(f"第{'一二三四五'[i]}，{x}。" for i, x in enumerate(ch.get("steps", [])[:5])) + "晚上記得回來打卡。"))
     return seg
 
 def duration(path):
