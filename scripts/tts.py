@@ -31,6 +31,8 @@ def segments(s):
     seg = [("", f"{s.get('title','')}。")]
     if s.get("source"):
         seg.append(("", "出自" + re.sub(r"[《》〈〉（）()・]", " ", s["source"]).strip() + "。"))
+    if s.get("hook"):
+        seg.append(("hook", s["hook"]))
     for i, p in enumerate(paras(s.get("story"))):
         seg.append((f"story-{i}", p))
     if s.get("verses"):
@@ -39,6 +41,16 @@ def segments(s):
             seg.append((f"verse-{vi}", (v.get("label", "") + "。" if v.get("label") else "") + "".join(v.get("lines", []))))
             for ni, n in enumerate(v.get("notes", [])):
                 seg.append((f"note-{vi}-{ni}", n.get("term", "") + "。" + "".join(paras(n.get("text")))))
+    m = s.get("modern") or {}
+    if m:
+        seg.append(("", "這段話，放到今天怎麼看？"))
+        for k, label in (("plain", "白話來說，"), ("why", ""), ("gap", "")):
+            if m.get(k):
+                seg.append((f"modern-{k}", label + "".join(paras(m[k]))))
+    if s.get("scenarios"):
+        seg.append(("", "用在生活裡，可以這樣做。"))
+        for i, x in enumerate(s["scenarios"]):
+            seg.append((f"sc-{i}", f"{x.get('situation','')}。以前可能會{x.get('before','')}換個做法：{x.get('after','')}" + (f"當下對自己說：{x['line']}" if x.get("line") else "")))
     if s.get("examples"):
         seg.append(("", "再看看生活裡的例子。"))
         for i, x in enumerate(s["examples"]):
@@ -47,6 +59,9 @@ def segments(s):
         seg.append(("take-r", "今天的省思。" + "".join(paras(s["reflection"]))))
     if s.get("practice"):
         seg.append(("take-p", "今天的功課。" + "".join(paras(s["practice"]))))
+    ch = s.get("challenge") or {}
+    if ch:
+        seg.append(("challenge", "最後，今天的實踐挑戰：" + ch.get("title", "") + "。" + "".join(f"第{'一二三四五'[i]}，{x}。" for i, x in enumerate(ch.get("steps", [])[:5])) + "晚上記得回來打卡。"))
     return seg
 
 def duration(path):

@@ -1,0 +1,23 @@
+{
+  "topics": [
+    {"id": "jingang", "name": "金剛經", "full": "金剛般若波羅蜜經", "unit": "分", "total": 32, "color": "#7a2014", "tagline": "不被表相綁住，心才自由"},
+    {"id": "daode", "name": "道德經", "full": "老子道德經", "unit": "章", "total": 81, "color": "#2f4a3a", "tagline": "柔軟的力量，最長久"},
+    {"id": "tanjing", "name": "六祖壇經", "full": "六祖大師法寶壇經", "unit": "品", "total": 10, "color": "#5a3a1c", "tagline": "本性具足，當下即是"},
+    {"id": "xinjing", "name": "心經", "full": "般若波羅蜜多心經", "unit": "句", "total": null, "color": "#2c3e5c", "tagline": "看透念頭，放下罣礙"},
+    {"id": "xunwen", "name": "一貫道訓文", "full": "一貫道訓文", "unit": "篇", "total": null, "color": "#8a5a12", "tagline": "前人的叮嚀，今日的功課"},
+    {"id": "cixun", "name": "仙佛慈訓", "full": "仙佛慈訓", "unit": "篇", "total": null, "color": "#6b2d4a", "tagline": "慈悲的提醒，修辦的方向"},
+    {"id": "yanjiuban", "name": "研究班課程", "full": "研究班課程", "unit": "課", "total": null, "color": "#3a4a5a", "tagline": "有系統地深入道理"},
+    {"id": "gushi", "name": "古籍智慧", "full": "四書與古籍譬喻", "unit": "則", "total": null, "color": "#4a3f2a", "tagline": "老祖宗的生活智慧"},
+    {"id": "review", "name": "一週實踐回顧", "full": "一週實踐回顧", "unit": "週", "total": null, "color": "#a8822f", "tagline": "讀過的，做到了多少？"}
+  ],
+  "schedule": {
+    "_說明": "依台北時間星期幾決定當天主題（0=週日）。friday 在訓文與仙佛慈訓之間輪替；若當週有研究班講義（materials/研究班/），週五改講研究班。",
+    "1": "jingang",
+    "2": "daode",
+    "3": "tanjing",
+    "4": "xinjing",
+    "5": ["xunwen", "cixun"],
+    "6": "jingang",
+    "0": "review"
+  }
+}

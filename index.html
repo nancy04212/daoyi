@@ -126,6 +126,78 @@ details.qa summary:hover{background:var(--fill)}
 .pager button[disabled]{opacity:.35;cursor:default}
 .endmark{text-align:center;color:var(--gold);margin:2.4em 0 0;letter-spacing:10px}
 
+/* ============ practice in reading ============ */
+.hook{max-width:34em;margin:22px auto 4px;font-family:var(--serifF);font-size:calc(var(--fs) * 1.18);line-height:1.7;font-weight:700;color:var(--ink);text-align:center;padding:6px 18px;position:relative;text-wrap:balance}
+.hook::before,.hook::after{content:"";display:block;width:36px;height:2px;background:var(--gold);margin:0 auto 12px;border-radius:2px}
+.hook::after{margin:12px auto 0}
+.todaychip{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--card);border-radius:16px;padding:14px 16px;margin:14px 0 0;box-shadow:0 1px 0 var(--line)}
+.todaychip:hover{background:var(--fill)}
+.todaychip .ic{flex:none;width:38px;height:38px;border-radius:11px;background:#2f6b4a;color:#fff;display:grid;place-items:center}
+.todaychip .ic svg{width:20px;height:20px}
+.todaychip .tx{flex:1;min-width:0}
+.todaychip .tx span{display:block;font-size:12px;color:var(--mute);font-weight:700;letter-spacing:1px}
+.todaychip .tx b{display:block;font-size:15.5px;line-height:1.45}
+.todaychip.done .ic{background:var(--gold)}
+.scn{background:var(--card);border-radius:16px;margin:0 0 12px;box-shadow:0 1px 0 var(--line);overflow:hidden}
+.scn h4{margin:0;padding:14px 18px 10px;font-family:var(--sans);font-size:15px;font-weight:800}
+.scn .ba{display:grid;grid-template-columns:1fr 1fr;border-top:.5px solid var(--line)}
+.scn .ba > div{padding:12px 16px 14px}
+.scn .ba > div + div{border-left:.5px solid var(--line);background:color-mix(in srgb,#2f6b4a 6%,transparent)}
+.scn .ba span{display:block;font-family:var(--sans);font-size:12px;font-weight:800;letter-spacing:1px;margin-bottom:4px;color:var(--mute)}
+.scn .ba div + div span{color:#2f6b4a}
+.scn .ba p{text-indent:0;margin:0;font-size:.93em;line-height:1.8}
+.scn .line{padding:11px 18px;border-top:.5px solid var(--line);font-family:var(--serifF);font-weight:700;color:var(--red);font-size:.98em}
+.scn .line::before{content:"當下對自己說：";font-family:var(--sans);font-weight:700;font-size:12px;color:var(--mute);margin-right:6px}
+@media (max-width:520px){.scn .ba{grid-template-columns:1fr}.scn .ba > div + div{border-left:none;border-top:.5px solid var(--line)}}
+.chal{background:linear-gradient(160deg,#2f6b4a,#1f4a33);color:#f2f7ef;border-radius:20px;padding:20px 20px 18px;margin:0 0 14px}
+.chal .k{font-family:var(--sans);font-size:12px;font-weight:800;letter-spacing:2px;color:#cfe6c9}
+.chal h3{font-family:var(--serifF);font-size:1.2em;margin:6px 0 10px;line-height:1.5}
+.chal ol{margin:0 0 14px;padding-left:1.3em;font-size:.95em;line-height:1.8}
+.chal .acts{display:flex;gap:8px;flex-wrap:wrap}
+.chal .acts button{border-radius:999px;padding:9px 15px;font-family:var(--sans);font-size:14px;font-weight:700;background:rgba(255,255,255,.14);color:#fff}
+.chal .acts button.main{background:#fff;color:#1f4a33}
+.sharebox{background:var(--card);border-radius:18px;padding:18px;box-shadow:0 1px 0 var(--line)}
+.sharebox .txt{font-size:.95em;line-height:1.9;white-space:pre-wrap;color:var(--ink2);max-height:16em;overflow:auto;padding:2px}
+.sharebox .btns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.sharebox .btns button{display:flex;flex-direction:column;align-items:center;gap:5px;padding:11px 4px;border-radius:12px;background:var(--fill);font-family:var(--sans);font-size:13px;font-weight:700}
+.sharebox .btns button:hover{background:var(--line)}
+.sharebox .btns svg{width:22px;height:22px}
+.sharebox .btns .line-btn{background:#06c755;color:#fff}
+
+/* ============ act view ============ */
+.streak{display:flex;align-items:center;gap:16px;background:var(--card);border-radius:18px;padding:16px 18px;box-shadow:0 1px 0 var(--line);margin-bottom:16px}
+.streak .n{font-size:44px;font-weight:800;color:#2f6b4a;line-height:1;font-variant-numeric:tabular-nums}
+.streak .l{font-size:13px;color:var(--mute);font-weight:700}
+.streak .l b{display:block;font-size:16px;color:var(--ink)}
+.dots{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-left:auto;min-width:150px}
+.dots i{width:16px;height:16px;border-radius:5px;background:var(--fill);justify-self:center}
+.dots i.s1{background:#2f6b4a}.dots i.s2{background:#9cc3a4}.dots i.s3{background:var(--line)}
+.dots i.today{outline:2px solid var(--red);outline-offset:1px}
+.stepck{display:flex;gap:12px;align-items:flex-start;padding:13px 16px;border-bottom:.5px solid var(--line);width:100%;text-align:left;font-size:15.5px;line-height:1.6}
+.stepck:last-child{border-bottom:none}
+.stepck .bx{flex:none;width:24px;height:24px;border-radius:7px;border:2px solid var(--mute);display:grid;place-items:center;margin-top:1px}
+.stepck.on .bx{background:#2f6b4a;border-color:#2f6b4a}
+.stepck.on .bx::after{content:"";width:6px;height:11px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.stepck.on span{color:var(--mute);text-decoration:line-through}
+.status3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}
+.status3 button{padding:13px 4px;border-radius:14px;background:var(--fill);font-size:14.5px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:4px}
+.status3 button i{font-style:normal;font-size:22px}
+.status3 button.on{background:#2f6b4a;color:#fff}
+.hist .row .date b{color:#2f6b4a}
+
+/* ============ shelf ============ */
+.shelf{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin:6px 0 26px}
+.cover{position:relative;aspect-ratio:3/4;border-radius:6px 14px 14px 6px;color:#fff6e6;padding:16px 14px 14px 20px;text-align:left;overflow:hidden;box-shadow:0 10px 22px rgba(40,20,10,.22),inset 6px 0 0 rgba(0,0,0,.18);display:flex;flex-direction:column;transition:transform .2s}
+.cover:hover{transform:translateY(-3px)}
+.cover::after{content:"";position:absolute;right:-30px;bottom:-30px;width:120px;height:120px;border-radius:50%;border:10px solid rgba(255,246,230,.14)}
+.cover .nm{font-family:var(--serifF);font-size:22px;font-weight:900;line-height:1.3;letter-spacing:2px}
+.cover .tg{font-size:12px;opacity:.85;margin-top:8px;line-height:1.5}
+.cover .ct{margin-top:auto;font-size:12px;font-weight:700;opacity:.9}
+.cover .bar{height:3px;background:rgba(255,255,255,.25);border-radius:2px;margin-top:6px;overflow:hidden}
+.cover .bar i{display:block;height:100%;background:#f6dc9a}
+.cover.on{outline:3px solid var(--ink);outline-offset:3px}
+.cover.dim{opacity:.55}
+
 /* ============ toc (desktop right rail) ============ */
 .toc{display:none}
 .toc a{display:block;padding:6px 12px;border-left:2px solid var(--line);color:var(--mute);text-decoration:none;font-size:13.5px;line-height:1.5}
@@ -315,10 +387,13 @@ input[type=range]{accent-color:var(--red)}
 <section class="view" id="v-read"><div class="inner"><div class="main" id="readMain"><div class="empty">正在展開今日的故事…</div></div><nav class="toc" id="toc" aria-label="本則目錄"></nav></div></section>
 
 <section class="view hidden" id="v-list"><div class="inner">
-  <div class="largetitle"><div><div class="sub">ARCHIVE</div><h1>往期</h1></div></div>
-  <div class="chips" id="chips"></div>
+  <div class="largetitle"><div><div class="sub">LIBRARY</div><h1>書架</h1></div></div>
+  <div class="shelf" id="shelf"></div>
+  <h2 class="sec" style="max-width:none;margin-top:6px" id="listTitle">全部故事</h2>
   <div class="group" id="listGroup"></div>
 </div></section>
+
+<section class="view hidden" id="v-act"><div class="inner" id="actInner"></div></section>
 
 <section class="view hidden" id="v-practice"><div class="inner">
   <div class="largetitle"><div><div class="sub">PRACTICE</div><h1>練講</h1></div></div>
@@ -363,7 +438,8 @@ input[type=range]{accent-color:var(--red)}
 <nav class="tabbar" aria-label="主選單">
   <div class="side-head"><img src="icons/icon-180.png" alt=""><div><b>每日道義</b><span>經典・訓文・練講</span></div></div>
   <button class="tab on" data-v="read"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5C10 5 7 4.5 3.5 5v13c3.5-.5 6.5 0 8.5 1.5 2-1.5 5-2 8.5-1.5V5C17 4.5 14 5 12 6.5Z"/><path d="M12 6.5v13"/></svg>今日</button>
-  <button class="tab" data-v="list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/></svg>往期</button>
+  <button class="tab" data-v="act"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.8 2.8L16.5 9.5"/></svg>實踐</button>
+  <button class="tab" data-v="list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h4v16H4zM10 4h4v16h-4zM16.5 4.8l3.8 1-3.9 14.7-3.8-1"/></svg>書架</button>
   <button class="tab" data-v="practice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3.5"/></svg>練講</button>
   <button class="tab" data-v="set"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>設定</button>
   <div class="side-foot" id="sideFoot">
@@ -440,7 +516,10 @@ $("#rateRange").oninput = e => { rate = +e.target.value; store.set("rate", rate)
 applyPrefs(); applyRate();
 
 /* ---------- data ---------- */
-let index = [], cache = {}, current = null;
+let index = [], cache = {}, current = null, topics = [], topicMap = {};
+async function loadTopics(){
+  try{ const r = await fetch("topics.json"); const j = await r.json(); topics = j.topics || []; topicMap = Object.fromEntries(topics.map(t => [t.id, t])); }catch(e){}
+}
 async function loadIndex(force){
   const r = await fetch("stories/index.json" + (force ? "?t="+Date.now() : ""), {cache: force ? "reload" : "default"});
   index = (await r.json()).sort((a,b) => a.date < b.date ? 1 : -1);
@@ -458,6 +537,7 @@ function go(v){
   $$(".view").forEach(el => el.classList.toggle("hidden", el.id !== "v-"+v));
   $$(".tab").forEach(b => b.classList.toggle("on", b.dataset.v === v));
   if(v === "list") renderList();
+  if(v === "act") renderAct();
   if(v === "practice") renderPractice();
   window.scrollTo(0, 0); updateProgress();
 }
@@ -500,6 +580,11 @@ function renderRead(){
     <div class="acts"><button class="pill light" id="listen"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>聽故事</button>
     <button class="pill ghost" id="toPractice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/></svg>練講</button></div></div>
     <div class="readmeta"><span>約 ${mins} 分鐘讀完</span><span>・</span><span>${textLen(s).toLocaleString()} 字</span></div>`;
+  if(s.challenge){
+    const st = store.get("act:" + s.date, {}), done = st.status === "done";
+    h += `<button class="todaychip ${done?"done":""}" id="toAct"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.8 2.8L16.5 9.5"/></svg></div><div class="tx"><span>${done ? "今日實踐・已完成" : "今日實踐"}</span><b>${esc(s.challenge.title)}</b></div><div class="chev"></div></button>`;
+  }
+  if(s.hook) h += `<div class="hook" data-k="hook">${esc(s.hook)}</div>`;
   h += `<article class="read">`;
   h += sec("s-story","故事") + `<div class="story">${paras(s.story).map((p,i) => `<p data-i="${i}" data-k="story-${i}">${esc(p)}</p>`).join("")}</div>`;
   if(s.verses?.length){
@@ -510,6 +595,16 @@ function renderRead(){
       h += `</div>`;
     });
   }
+  if(s.modern){
+    h += sec("s-modern","現代怎麼看");
+    if(s.modern.plain) h += `<div class="box accent" data-k="modern-plain"><h3>白話一句</h3>${P(s.modern.plain)}</div>`;
+    if(s.modern.why) h += `<div class="box" data-k="modern-why"><h3>為什麼今天仍然受用</h3>${P(s.modern.why)}</div>`;
+    if(s.modern.gap) h += `<div class="box" data-k="modern-gap"><h3>古今不同，怎麼轉換</h3>${P(s.modern.gap)}</div>`;
+  }
+  if(s.scenarios?.length){
+    h += sec("s-use","用在生活");
+    h += s.scenarios.map((x,i) => `<div class="scn" data-k="sc-${i}"><h4>${esc(x.situation)}</h4><div class="ba"><div><span>慣性反應</span><p>${esc(x.before)}</p></div><div><span>換個做法</span><p>${esc(x.after)}</p></div></div>${x.line ? `<div class="line">${esc(x.line)}</div>` : ""}</div>`).join("");
+  }
   if(s.examples?.length) h += sec("s-ex","生活裡的例子") + s.examples.map((x,i) => `<div class="box" data-k="ex-${i}"><h3>${esc(x.title)}</h3>${P(x.text)}</div>`).join("");
   if(s.deeper?.length) h += sec("s-why","為什麼？") + s.deeper.map((d,i) => `<details class="qa" ${i===0?"open":""}><summary>${esc(d.q)}</summary><div class="a">${P(d.a)}</div></details>`).join("");
   if(s.yiguandao) h += sec("s-dao","與道的連結") + `<div class="box accent">${P(s.yiguandao)}</div>`;
@@ -518,7 +613,16 @@ function renderRead(){
     if(s.reflection) h += `<div class="box" data-k="take-r"><h3>省思</h3>${P(s.reflection)}</div>`;
     if(s.practice) h += `<div class="box" data-k="take-p"><h3>今日功課</h3>${P(s.practice)}</div>`;
   }
+  if(s.challenge){
+    const st = store.get("act:" + s.date, {});
+    h += sec("s-chal","今日實踐") + `<div class="chal" data-k="challenge"><div class="k">TODAY'S PRACTICE</div><h3>${esc(s.challenge.title)}</h3><ol>${(s.challenge.steps||[]).map(x => `<li>${esc(x)}</li>`).join("")}</ol>
+      <div class="acts"><button class="main" id="chalGo">${st.status ? "查看我的實踐" : "開始，晚上回來打卡"}</button></div></div>`;
+  }
   if(s.forTeller) h += sec("s-teller","給講道義的你") + `<div class="box">${P(s.forTeller)}</div>`;
+  h += sec("s-share","分享給朋友") + `<div class="sharebox"><div class="txt">${esc(shareText(s))}</div>
+    <div class="btns"><button class="line-btn" id="shLine"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3C6.5 3 2 6.6 2 11c0 3.9 3.5 7.2 8.3 7.9.3.1.8.2.9.5.1.3.1.7 0 1l-.1.9c0 .3-.2 1 .9.5s5.9-3.5 8.1-6C21.6 14.3 22 12.7 22 11c0-4.4-4.5-8-10-8Z"/></svg>傳 LINE</button>
+    <button id="shCopy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>複製文字</button>
+    <button id="shCard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>圖卡</button></div></div>`;
   if(s.sources?.length) h += sec("s-src","參考來源") + `<div class="srcs">` + s.sources.map(x => /^https?:/.test(x.url||"") ? `<div>・<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.title || x.url)}</a></div>` : `<div>・${esc(x.title)}</div>`).join("") + `</div>`;
   h += `<div class="endmark">◆ ◆ ◆</div>`;
   h += `<div class="pager"><button class="prev" ${prev?"":"disabled"} data-d="${prev?.date||""}"><span>‹ 上一則</span><b>${esc(prev?.title || "已經是第一則")}</b></button>
@@ -535,10 +639,15 @@ function renderRead(){
     $$("#sheetBody .toclist a").forEach(a => a.onclick = e => { e.preventDefault(); closeSheet(); setTimeout(() => jump(a.dataset.id), 200); });
   };
   $("#shareBtn").onclick = async () => {
-    const data = { title: s.title, text: `${s.title}｜每日道義`, url: location.href };
+    const data = { title: s.title, text: shareText(s), url: location.href.split("#")[0] + "#" + s.date };
     try{ if(navigator.share) await navigator.share(data); else { await navigator.clipboard.writeText(data.url); toast("已複製連結"); } }catch(e){}
   };
   $$(".pager button").forEach(b => b.onclick = () => b.dataset.d && openStory(b.dataset.d));
+  if($("#toAct")) $("#toAct").onclick = () => go("act");
+  if($("#chalGo")) $("#chalGo").onclick = () => go("act");
+  $("#shLine").onclick = () => shareLine(s);
+  $("#shCopy").onclick = async () => { try{ await navigator.clipboard.writeText(shareText(s, true)); toast("已複製，可以貼給朋友"); }catch(e){ toast("複製失敗"); } };
+  $("#shCard").onclick = () => { pTab = "card"; go("practice"); };
   if($("#banner")){ $("#bannerX").onclick = () => { store.set("bannerX", true); $("#banner").remove(); }; $("#bannerGo").onclick = showInstall; }
   updateProgress();
 }
@@ -555,19 +664,85 @@ function updateProgress(){
 addEventListener("scroll", updateProgress, {passive:true});
 addEventListener("resize", updateProgress);
 
-/* ---------- list ---------- */
-let filter = "全部";
+/* ---------- shelf ---------- */
+let filter = "all";
 function renderList(){
-  const series = ["全部", ...new Set(index.map(x => x.series).filter(Boolean))];
-  $("#chips").innerHTML = series.map(x => `<button class="chip ${x===filter?"on":""}">${esc(x)}</button>`).join("");
-  $$("#chips .chip").forEach(b => b.onclick = () => { filter = b.textContent; renderList(); });
-  const items = index.filter(x => filter === "全部" || x.series === filter);
+  const counts = {}; index.forEach(x => counts[x.topic || "gushi"] = (counts[x.topic || "gushi"] || 0) + 1);
+  $("#shelf").innerHTML = topics.map(t => {
+    const n = counts[t.id] || 0, pct = t.total ? Math.min(100, n / t.total * 100) : 0;
+    return `<button class="cover ${filter===t.id?"on":""} ${n?"":"dim"}" data-t="${t.id}" style="background:linear-gradient(160deg, ${t.color}, color-mix(in srgb, ${t.color} 70%, #000))">
+      <div class="nm">${esc(t.name)}</div><div class="tg">${esc(t.tagline || "")}</div>
+      <div class="ct">${n ? `${n} 則` : "即將開講"}${t.total ? `・共 ${t.total} ${esc(t.unit)}` : ""}</div>${t.total ? `<div class="bar"><i style="width:${pct}%"></i></div>` : ""}</button>`;
+  }).join("");
+  $$("#shelf .cover").forEach(b => b.onclick = () => { filter = filter === b.dataset.t ? "all" : b.dataset.t; renderList(); $("#listTitle").scrollIntoView({behavior:"smooth", block:"start"}); });
+  const items = index.filter(x => filter === "all" || (x.topic || "gushi") === filter);
+  $("#listTitle").textContent = filter === "all" ? "全部故事" : (topicMap[filter]?.name || "") + "・" + items.length + " 則";
   $("#listGroup").innerHTML = items.length ? items.map(x => {
     const d = new Date(x.date+"T00:00:00");
     return `<button class="row" data-d="${x.date}"><div class="date"><b>${d.getDate()}</b><span>${d.getMonth()+1}月</span></div>
-      <div class="t"><b>${esc(x.title)}</b><span>${esc(x.series||"")}${x.part?"・"+esc(x.part):""}${x.no?"　第 "+x.no+" 則":""}</span></div><div class="chev"></div></button>`;
-  }).join("") : `<div class="empty">還沒有故事</div>`;
+      <div class="t"><b>${esc(x.title)}</b><span>${esc(x.series||"")}${x.part?"・"+esc(x.part):""}${x.hook ? "｜" + esc(x.hook) : ""}</span></div><div class="chev"></div></button>`;
+  }).join("") : `<div class="empty">這個主題即將開講，每天早上會依序更新。</div>`;
   $$("#listGroup .row").forEach(b => b.onclick = async () => { await openStory(b.dataset.d); go("read"); });
+}
+
+/* ---------- share ---------- */
+function shareText(s, withLink){
+  const body = s.share?.text || [s.hook, paras(s.modern?.plain)[0], s.challenge ? "今天試試：" + s.challenge.title : ""].filter(Boolean).join("\n\n");
+  const link = location.origin + location.pathname + "#" + s.date;
+  return body + (withLink ? `\n\n——每日道義｜${s.title}\n${link}` : "");
+}
+function shareLine(s){
+  const url = "https://line.me/R/share?text=" + encodeURIComponent(shareText(s, true));
+  window.open(url, "_blank", "noopener");
+}
+
+/* ---------- act (practice in daily life) ---------- */
+function actState(date){ return store.get("act:" + date, {status: "", steps: [], note: ""}); }
+function ymd(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; }
+function streakInfo(){
+  const today = new Date(); let n = 0;
+  for(let i = 0; i < 400; i++){
+    const d = new Date(today); d.setDate(today.getDate() - i);
+    const st = actState(ymd(d)).status;
+    if(st === "done" || st === "part"){ n++; } else if(i > 0){ break; }
+  }
+  const days = [];
+  for(let i = 27; i >= 0; i--){ const d = new Date(today); d.setDate(today.getDate() - i); days.push({date: ymd(d), st: actState(ymd(d)).status, today: i === 0}); }
+  return {n, days};
+}
+function renderAct(){
+  const s = current; if(!s) return;
+  const st = actState(s.date), info = streakInfo(), ch = s.challenge;
+  let h = `<div class="largetitle"><div><div class="sub">PRACTICE IN LIFE</div><h1>實踐</h1></div></div>
+    <div class="streak"><div class="n">${info.n}</div><div class="l"><b>天連續實踐</b>做到一部分也算數</div>
+    <div class="dots" aria-label="近四週">${info.days.map(d => `<i class="${d.st==="done"?"s1":d.st==="part"?"s2":d.st==="skip"?"s3":""} ${d.today?"today":""}" title="${d.date}"></i>`).join("")}</div></div>`;
+  if(!ch){ h += `<div class="empty">這則沒有實踐挑戰，回到「今日」看看最新一則吧。</div>`; $("#actInner").innerHTML = h; return; }
+  h += `<div class="ctx">來自：<b>${esc(s.title)}</b></div>
+    <div class="chal"><div class="k">TODAY'S PRACTICE</div><h3>${esc(ch.title)}</h3>${s.hook ? `<p style="margin:0;opacity:.88;font-size:15px;line-height:1.7">${esc(s.hook)}</p>` : ""}</div>
+    <div class="group">${(ch.steps||[]).map((x,i) => `<button class="stepck ${st.steps.includes(i)?"on":""}" data-i="${i}"><div class="bx"></div><span>${esc(x)}</span></button>`).join("")}</div>
+    <div class="sec" style="max-width:none">晚上回來打卡</div>
+    <div class="status3">
+      <button data-s="done" class="${st.status==="done"?"on":""}"><i>🌕</i>做到了</button>
+      <button data-s="part" class="${st.status==="part"?"on":""}"><i>🌗</i>做了一部分</button>
+      <button data-s="skip" class="${st.status==="skip"?"on":""}"><i>🌑</i>明天再試</button></div>
+    <div class="box" style="margin-bottom:10px"><h3>今晚問問自己</h3><p style="font-family:var(--read);line-height:1.8">${esc(ch.evening || "今天你做到了什麼？遇到什麼困難？")}</p></div>
+    <textarea id="actNote" placeholder="寫下今天發生的事、你的感受…（只存在這台裝置）">${esc(st.note)}</textarea>`;
+  if(s.scenarios?.length){
+    h += `<div class="sec" style="max-width:none">口袋小卡：當下對自己說</div><div class="group">` + s.scenarios.map(x => `<div class="setrow" style="align-items:flex-start"><div class="lbl" style="font-size:15px;line-height:1.6"><span style="display:block;font-size:12.5px;color:var(--mute)">${esc(x.situation)}</span><b style="font-family:var(--serifF);color:var(--red)">${esc(x.line || x.after)}</b></div></div>`).join("") + `</div>`;
+  }
+  const past = index.filter(x => x.date !== s.date && actState(x.date).status).slice(0, 14);
+  if(past.length){
+    h += `<div class="sec" style="max-width:none">實踐紀錄</div><div class="group hist">` + past.map(x => {
+      const a = actState(x.date), d = new Date(x.date+"T00:00:00");
+      return `<button class="row" data-d="${x.date}"><div class="date"><b>${d.getDate()}</b><span>${d.getMonth()+1}月</span></div><div class="t"><b>${a.status==="done"?"🌕":a.status==="part"?"🌗":"🌑"} ${esc(x.title)}</b><span>${esc(a.note ? a.note.slice(0, 40) : "（沒有寫心得）")}</span></div><div class="chev"></div></button>`;
+    }).join("") + `</div>`;
+  }
+  $("#actInner").innerHTML = h;
+  const save = () => store.set("act:" + s.date, st);
+  $$("#actInner .stepck").forEach(b => b.onclick = () => { const i = +b.dataset.i; st.steps = st.steps.includes(i) ? st.steps.filter(x => x !== i) : [...st.steps, i]; b.classList.toggle("on"); save(); });
+  $$("#actInner .status3 button").forEach(b => b.onclick = () => { st.status = b.dataset.s; save(); renderAct(); toast(st.status === "done" ? "太好了，做到了 🙏" : st.status === "part" ? "有開始就很好" : "明天再試，沒關係"); });
+  $("#actNote").oninput = e => { st.note = e.target.value; save(); };
+  $$("#actInner .hist .row").forEach(b => b.onclick = async () => { await openStory(b.dataset.d); renderAct(); window.scrollTo(0,0); });
 }
 
 /* ---------- listening: natural-voice audio first, browser voice as fallback ---------- */
@@ -925,13 +1100,13 @@ $("#refresh").onclick = async () => { await boot(true); toast("已更新"); go("
 /* ---------- boot ---------- */
 async function boot(force){
   try{
-    await loadIndex(force);
+    await Promise.all([loadIndex(force), topics.length ? null : loadTopics()]);
     if(!index.length){ $("#readMain").innerHTML = `<div class="empty">第一則故事正在準備中</div>`; return; }
     if(force) cache = {};
     const h = location.hash.replace("#", "");
     await openStory(index.find(x => x.date === h) ? h : index[0].date);
     const v = new URLSearchParams(location.search).get("v");
-    if(["list","practice","set"].includes(v)) go(v);
+    if(["list","practice","set","act"].includes(v)) go(v);
   }catch(e){
     $("#readMain").innerHTML = `<div class="empty">讀不到故事，請確認網路後重新整理。</div>`;
   }
