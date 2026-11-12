@@ -13,7 +13,7 @@ GAP = 0.7  # seconds of silence between paragraphs
 # --- voice provider: Gemini (most natural) > OpenAI > Edge (free fallback) ---
 GEMINI_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
 OPENAI_KEY = os.environ.get("OPENAI_API_KEY", "").strip()
-GEMINI_MODELS = [m for m in [os.environ.get("GEMINI_TTS_MODEL", "").strip(), "gemini-3.8-flash-tts", "gemini-3.8-flash-tts-preview", "gemini-3.1-flash-tts-preview", "gemini-2.5-flash-preview-tts"] if m]
+GEMINI_MODELS = [m for m in [os.environ.get("GEMINI_TTS_MODEL", "").strip(), "gemini-3.8-flash-tts", "gemini-3.8-flash-lite-tts", "gemini-3.1-flash-tts-preview", "gemini-2.5-flash-preview-tts", "gemini-2.5-pro-preview-tts"] if m]
 GEMINI_VOICE = os.environ.get("GEMINI_VOICE", "Sulafat").strip() or "Sulafat"
 OPENAI_MODEL = os.environ.get("OPENAI_TTS_MODEL", "gpt-4o-mini-tts").strip()
 OPENAI_VOICE = os.environ.get("OPENAI_VOICE", "marin").strip()
@@ -86,13 +86,14 @@ def _post(url, body, headers):
         return r.read()
 
 _auth_mode = [0]
+_dead = set()
 def _gemini_auth():
     # AI Studio keys go in x-goog-api-key; some newer key types need a Bearer header
     return {"x-goog-api-key": GEMINI_KEY} if _auth_mode[0] == 0 else {"Authorization": f"Bearer {GEMINI_KEY}"}
 
 def gemini_synth(text, path):
     global _gemini_model
-    models = [_gemini_model] if _gemini_model else GEMINI_MODELS
+    models = ([_gemini_model] if _gemini_model else []) + [m for m in GEMINI_MODELS if m != _gemini_model and m not in _dead]
     last = None
     for model in models:
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
@@ -106,9 +107,15 @@ def gemini_synth(text, path):
                 pcm = path.with_suffix(".pcm"); pcm.write_bytes(base64.b64decode(part["inlineData"]["data"]))
                 subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "s16le", "-ar", "24000", "-ac", "1", "-i", str(pcm), str(path)], check=True)
                 _gemini_model = model
+                time.sleep(float(os.environ.get("GEMINI_PACE", "4")))
                 return
             except urllib.error.HTTPError as e:
-                msg = e.read().decode(errors="ignore")[:300]; last = f"{model}: {e.code} {msg}"
+                msg = e.read().decode(errors="ignore"); last = f"{model}: {e.code} {msg[:1500]}"
+                if e.code == 429 and ("quota" in msg.lower()) and ("per day" in msg.lower() or "limit: 0" in msg.lower() or attempt >= 1):
+                    print(f"  {model}: quota exhausted -> trying next model"); print("   ", re.sub(r"\s+", " ", msg)[:600])
+                    _dead.add(model)
+                    if _gemini_model == model: _gemini_model = None
+                    break
                 if e.code == 401 and _auth_mode[0] < 1:
                     _auth_mode[0] += 1; print("  switching auth header"); continue
                 if e.code in (404, 400) and ("not found" in msg.lower() or "not supported" in msg.lower() or e.code == 404):
