@@ -85,18 +85,23 @@ def _post(url, body, headers):
     with urllib.request.urlopen(req, timeout=180) as r:
         return r.read()
 
+_auth_mode = [0]
+def _gemini_auth():
+    # AI Studio keys go in x-goog-api-key; some newer key types need a Bearer header
+    return {"x-goog-api-key": GEMINI_KEY} if _auth_mode[0] == 0 else {"Authorization": f"Bearer {GEMINI_KEY}"}
+
 def gemini_synth(text, path):
     global _gemini_model
     models = [_gemini_model] if _gemini_model else GEMINI_MODELS
     last = None
     for model in models:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={GEMINI_KEY}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
         body = {"contents": [{"parts": [{"text": STYLE + "\n\n" + text}]}],
                 "generationConfig": {"responseModalities": ["AUDIO"],
                                      "speechConfig": {"voiceConfig": {"prebuiltVoiceConfig": {"voiceName": GEMINI_VOICE}}}}}
         for attempt in range(6):
             try:
-                data = json.loads(_post(url, body, {}))
+                data = json.loads(_post(url, body, _gemini_auth()))
                 part = next(p for p in data["candidates"][0]["content"]["parts"] if "inlineData" in p)
                 pcm = path.with_suffix(".pcm"); pcm.write_bytes(base64.b64decode(part["inlineData"]["data"]))
                 subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "s16le", "-ar", "24000", "-ac", "1", "-i", str(pcm), str(path)], check=True)
@@ -104,6 +109,8 @@ def gemini_synth(text, path):
                 return
             except urllib.error.HTTPError as e:
                 msg = e.read().decode(errors="ignore")[:300]; last = f"{model}: {e.code} {msg}"
+                if e.code == 401 and _auth_mode[0] < 1:
+                    _auth_mode[0] += 1; print("  switching auth header"); continue
                 if e.code in (404, 400) and ("not found" in msg.lower() or "not supported" in msg.lower() or e.code == 404):
                     print("  model unavailable:", model); break
                 wait = 20 * (attempt + 1) if e.code == 429 else 5
