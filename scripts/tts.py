@@ -46,6 +46,8 @@ def segments(s):
         seg.append(("", "出自" + re.sub(r"[《》〈〉（）()・]", " ", s["source"]).strip() + "。"))
     if s.get("hook"):
         seg.append(("hook", s["hook"]))
+    if s.get("people"):
+        seg.append(("", "先認識這段經文裡的人物。" + "".join(f"{x.get('name','')}：{x.get('desc','')}" for x in s["people"])))
     for i, p in enumerate(paras(s.get("story"))):
         seg.append((f"story-{i}", p))
     if s.get("verses"):
@@ -53,7 +55,7 @@ def segments(s):
         for vi, v in enumerate(s["verses"]):
             seg.append((f"verse-{vi}", (v.get("label", "") + "。" if v.get("label") else "") + "".join(v.get("lines", []))))
             for ni, n in enumerate(v.get("notes", [])):
-                seg.append((f"note-{vi}-{ni}", n.get("term", "") + "。" + "".join(paras(n.get("text")))))
+                seg.append((f"note-{vi}-{ni}", n.get("term", "") + "。" + "".join(paras(n.get("text"))) + (("白話來說：" + n["plain"]) if n.get("plain") else "")))
     if s.get("yiguandao"):
         seg.append(("dao", "與道的連結。" + "".join(paras(s["yiguandao"]))))
     m = s.get("modern") or {}
