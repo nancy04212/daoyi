@@ -25,6 +25,17 @@ jobs:
       - name: 更新索引
         if: env.CHANGED == '1'
         run: python scripts/build_index.py
+      - name: 先發布文字
+        if: env.CHANGED == '1'
+        run: |
+          git config user.name "daoyi-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add stories
+          git commit -m "發布新故事 ${DATES}"
+          git pull --rebase origin main
+          git push
+          curl -sS -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/${{ github.repository }}/pages/builds || true
       - name: 安裝語音工具
         run: |
           pip install edge-tts
@@ -34,13 +45,13 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: python scripts/tts.py
-      - name: 提交
+      - name: 提交音檔
         run: |
           git config user.name "daoyi-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add stories audio
+          git add audio
           if git diff --cached --quiet; then echo "沒有變更"; exit 0; fi
-          git commit -m "發布新故事 ${DATES:-（朗讀補錄）}"
+          git commit -m "朗讀音檔 ${DATES:-補錄}"
           git pull --rebase origin main
           git push
           echo "PUSHED=1" >> "$GITHUB_ENV"
