@@ -56,7 +56,8 @@ def segments(s):
             seg.append((f"verse-{vi}", (v.get("label", "") + "。" if v.get("label") else "") + "".join(v.get("lines", []))))
             for ni, n in enumerate(v.get("notes", [])):
                 parts = "".join(f"{x.get('w','')}，{x.get('m','')}。" for x in n.get("parts", []))
-                seg.append((f"note-{vi}-{ni}", n.get("term", "") + "。" + (("白話來說：" + n["plain"]) if n.get("plain") else "") + parts + "".join(paras(n.get("text")))))
+                quotes = "".join(f"{q.get('src','')}：{q.get('text','')}。" + (f"意思是：{q['mean']}" if q.get("mean") else "") for q in n.get("quotes", []))
+                seg.append((f"note-{vi}-{ni}", n.get("term", "") + "。" + (("白話來說：" + n["plain"]) if n.get("plain") else "") + parts + quotes + "".join(paras(n.get("text")))))
     if s.get("yiguandao"):
         seg.append(("dao", "與道的連結。" + "".join(paras(s["yiguandao"]))))
     m = s.get("modern") or {}
