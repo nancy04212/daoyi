@@ -1,0 +1,51 @@
+name: 從暫存表發布新故事
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "41 22 * * *"   # 06:41 台北
+    - cron: "19 23 * * *"   # 07:19 台北
+    - cron: "7 1 * * *"     # 09:07 台北
+    - cron: "29 8 * * *"    # 16:29 台北（語音額度重置後）
+permissions:
+  contents: write
+  pages: write
+concurrency:
+  group: publish
+  cancel-in-progress: false
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: 讀取暫存表
+        run: python scripts/sync_inbox.py
+      - name: 更新索引
+        if: env.CHANGED == '1'
+        run: python scripts/build_index.py
+      - name: 安裝語音工具
+        run: |
+          pip install edge-tts
+          which ffmpeg || (sudo apt-get update && sudo apt-get install -y ffmpeg)
+      - name: 產生朗讀（只做尚未完成的）
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: python scripts/tts.py
+      - name: 提交
+        run: |
+          git config user.name "daoyi-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add stories audio
+          if git diff --cached --quiet; then echo "沒有變更"; exit 0; fi
+          git commit -m "發布新故事 ${DATES:-（朗讀補錄）}"
+          git pull --rebase origin main
+          git push
+          echo "PUSHED=1" >> "$GITHUB_ENV"
+      - name: 重新發布網站
+        if: env.PUSHED == '1'
+        run: |
+          curl -sS -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/${{ github.repository }}/pages/builds || true
