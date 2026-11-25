@@ -184,6 +184,17 @@ details.people[open] summary::after{transform:rotate(-135deg)}
 .plist b{font-family:var(--serifF);font-size:15.5px}
 .plist p{margin:3px 0 0;font-size:14.5px;line-height:1.75;color:var(--ink2);text-indent:0;text-align:left}
 @media (min-width:900px){details.people{max-width:none}}
+.jw{font-family:var(--serifF);font-weight:700;color:var(--quote,#7a2a1c)}
+html[data-theme="night"] .jw{--quote:#e6b48a}
+html[data-theme="green"] .jw{--quote:#5a3a14}
+.note p.plain{margin:.2em 0 .7em}
+dl.parts{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0 0 .8em;padding:10px 12px;border-radius:10px;background:var(--fill);font-size:.92em;line-height:1.7}
+dl.parts dt{font-family:var(--serifF);font-weight:700;color:var(--ink);white-space:nowrap}
+dl.parts dd{margin:0;color:var(--ink2)}
+.ptr{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 8px);transform:translate(-50%,-70px);z-index:65;width:40px;height:40px;border-radius:50%;background:var(--card);box-shadow:0 4px 14px rgba(0,0,0,.15);display:grid;place-items:center;transition:transform .2s}
+.ptr svg{width:20px;height:20px;color:var(--red);transition:transform .1s}
+.ptr.spin svg{animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 /* ============ act view ============ */
 .streak{display:flex;align-items:center;gap:16px;background:var(--card);border-radius:18px;padding:16px 18px;box-shadow:0 1px 0 var(--line);margin-bottom:16px}
 .streak .n{font-size:44px;font-weight:800;color:#2f6b4a;line-height:1;font-variant-numeric:tabular-nums}
@@ -403,6 +414,7 @@ input[type=range]{accent-color:var(--red)}
 </head>
 <body>
 <div class="progress" id="progress"></div>
+<div class="ptr" id="ptr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"/></svg></div>
 
 <section class="view" id="v-read"><div class="inner"><div class="main" id="readMain"><div class="empty">正在展開今日的故事…</div></div><nav class="toc" id="toc" aria-label="本則目錄"></nav></div></section>
 
@@ -476,7 +488,9 @@ input[type=range]{accent-color:var(--red)}
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const paras = t => (Array.isArray(t) ? t : String(t || "").split(/\n+/)).map(x => String(x).trim()).filter(Boolean);
-const P = (arr, cls) => paras(arr).map(x => `<p${cls ? ` class="${cls}"` : ""}>${esc(x)}</p>`).join("");
+const fmt = s => esc(s).replace(/〖([^〗]+)〗/g, '<span class="jw">「$1」</span>');
+const plainTxt = s => String(s ?? "").replace(/〖([^〗]+)〗/g, "「$1」");
+const P = (arr, cls) => paras(arr).map(x => `<p${cls ? ` class="${cls}"` : ""}>${fmt(x)}</p>`).join("");
 const store = {
   get(k, d){ try{ const v = localStorage.getItem("dy:"+k); return v == null ? d : JSON.parse(v); }catch(e){ return d; } },
   set(k, v){ try{ localStorage.setItem("dy:"+k, JSON.stringify(v)); }catch(e){} }
@@ -538,12 +552,12 @@ async function loadTopics(){
   try{ const r = await fetch("topics.json"); const j = await r.json(); topics = j.topics || []; topicMap = Object.fromEntries(topics.map(t => [t.id, t])); }catch(e){}
 }
 async function loadIndex(force){
-  const r = await fetch("stories/index.json" + (force ? "?t="+Date.now() : ""), {cache: force ? "reload" : "default"});
+  const r = await fetch("stories/index.json?t=" + Date.now(), {cache: "no-store"});
   index = (await r.json()).sort((a,b) => a.date < b.date ? 1 : -1);
 }
 async function getStory(date){
   if(cache[date]) return cache[date];
-  const r = await fetch(`stories/${date}.json`);
+  const r = await fetch(`stories/${date}.json`, {cache: "no-cache"});
   return cache[date] = await r.json();
 }
 
@@ -601,12 +615,12 @@ function renderRead(){
   if(s.hook) h += `<div class="hook" data-k="hook">${esc(s.hook)}</div>`;
   h += `<article class="read">`;
   if(s.people?.length) h += `<details class="people"><summary><span>認識人物</span><b>${s.people.map(x => esc(x.name)).join("・")}</b></summary><div class="plist">${s.people.map(x => `<div><b>${esc(x.name)}</b><p>${esc(x.desc)}</p></div>`).join("")}</div></details>`;
-  h += sec("s-story","故事") + `<div class="story">${paras(s.story).map((p,i) => `<p data-i="${i}" data-k="story-${i}">${esc(p)}</p>`).join("")}</div>`;
+  h += sec("s-story","故事") + `<div class="story">${paras(s.story).map((p,i) => `<p data-i="${i}" data-k="story-${i}">${fmt(p)}</p>`).join("")}</div>`;
   if(s.verses?.length){
     h += sec("s-verse","逐句細解");
     s.verses.forEach((v, vi) => {
       h += `<div class="verse"><div class="vlabel">${esc(v.label || "")}</div><div class="vlines" data-k="verse-${vi}">${(v.lines||[]).map(esc).join("<br>")}</div>`;
-      (v.notes||[]).forEach((n, ni) => h += `<div class="note" data-k="note-${vi}-${ni}"><b>「${esc(n.term)}」</b>${P(n.text)}${n.plain ? `<p class="plain"><span>白話</span>${esc(n.plain)}</p>` : ""}</div>`);
+      (v.notes||[]).forEach((n, ni) => h += `<div class="note" data-k="note-${vi}-${ni}"><b>「${esc(n.term)}」</b>${n.plain ? `<p class="plain"><span>白話</span>${fmt(n.plain)}</p>` : ""}${n.parts?.length ? `<dl class="parts">${n.parts.map(x => `<dt>${fmt(x.w)}</dt><dd>${fmt(x.m)}</dd>`).join("")}</dl>` : ""}${P(n.text)}</div>`);
       h += `</div>`;
     });
   }
@@ -627,10 +641,9 @@ function renderRead(){
     const d = s.daoyi;
     h += sec("s-daoyi","化為道義");
     if(d.theme) h += `<div class="dy-theme"><span>這一講的主旨</span>${esc(d.theme)}</div>`;
-    if(d.points?.length) h += `<div class="box"><h3>三個重點</h3><ol class="dy-pts">${d.points.map(x => `<li>${esc(x)}</li>`).join("")}</ol></div>`;
     if(d.opening) h += `<div class="box"><h3>怎麼開場</h3>${P(d.opening)}</div>`;
     if(d.bridge) h += `<div class="box"><h3>怎麼連到聽者自己</h3>${P(d.bridge)}</div>`;
-    if(d.cautions?.length) h += `<div class="box"><h3>容易講偏的地方</h3><ul class="dy-pts">${d.cautions.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>`;
+    if(d.cautions?.length) h += `<div class="box"><h3>容易講偏的地方</h3><ul class="dy-pts">${d.cautions.map(x => `<li>${fmt(x)}</li>`).join("")}</ul></div>`;
     h += `<div class="btnrow"><button class="btn primary" id="toTalk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/></svg>用講稿練一次</button></div>`;
     if(s.share?.text) h += `<details class="qa"><summary>給還沒求道的朋友：可直接傳的短文</summary><div class="a"><div class="sharebox" style="box-shadow:none;padding:4px 0 10px"><div class="txt">${esc(shareText(s))}</div>
       <div class="btns"><button class="line-btn" id="shLine"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3C6.5 3 2 6.6 2 11c0 3.9 3.5 7.2 8.3 7.9.3.1.8.2.9.5.1.3.1.7 0 1l-.1.9c0 .3-.2 1 .9.5s5.9-3.5 8.1-6C21.6 14.3 22 12.7 22 11c0-4.4-4.5-8-10-8Z"/></svg>傳 LINE</button>
@@ -641,11 +654,6 @@ function renderRead(){
     h += sec("s-take","今日帶走");
     if(s.reflection) h += `<div class="box" data-k="take-r"><h3>省思</h3>${P(s.reflection)}</div>`;
     if(s.practice) h += `<div class="box" data-k="take-p"><h3>今日功課</h3>${P(s.practice)}</div>`;
-  }
-  if(s.challenge){
-    const st = store.get("act:" + s.date, {});
-    h += sec("s-chal","今日實踐") + `<div class="chal"><div class="k">把今天讀到的分享出去</div><h3>${esc(s.challenge.title)}</h3><ol>${(s.challenge.steps||[]).map(x => `<li>${esc(x)}</li>`).join("")}</ol>
-      <div class="acts"><button class="main" id="chalGo">${st.status ? "查看我的實踐" : "開始，晚上回來打卡"}</button></div></div>`;
   }
   if(s.forTeller) h += sec("s-teller","給講道義的你") + `<div class="box">${P(s.forTeller)}</div>`;
   if(s.sources?.length) h += sec("s-src","參考來源") + `<div class="srcs">` + s.sources.map(x => /^https?:/.test(x.url||"") ? `<div>・<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.title || x.url)}</a></div>` : `<div>・${esc(x.title)}</div>`).join("") + `</div>`;
@@ -693,7 +701,7 @@ addEventListener("resize", updateProgress);
 let filter = "all";
 function renderList(){
   const counts = {}; index.forEach(x => counts[x.topic || "gushi"] = (counts[x.topic || "gushi"] || 0) + 1);
-  $("#shelf").innerHTML = topics.map(t => {
+  $("#shelf").innerHTML = topics.filter(t => !t.hidden).map(t => {
     const n = counts[t.id] || 0, pct = t.total ? Math.min(100, n / t.total * 100) : 0;
     return `<button class="cover ${filter===t.id?"on":""} ${n?"":"dim"}" data-t="${t.id}" style="background:linear-gradient(160deg, ${t.color}, color-mix(in srgb, ${t.color} 70%, #000))">
       <div class="nm">${esc(t.name)}</div><div class="tg">${esc(t.tagline || "")}</div>
@@ -712,7 +720,7 @@ function renderList(){
 
 /* ---------- share ---------- */
 function shareText(s, withLink){
-  const body = s.share?.text || [s.hook, paras(s.modern?.plain)[0], s.challenge ? "今天試試：" + s.challenge.title : ""].filter(Boolean).join("\n\n");
+  const body = plainTxt(s.share?.text) || [s.hook, paras(s.modern?.plain)[0], s.challenge ? "今天試試：" + s.challenge.title : ""].filter(Boolean).join("\n\n");
   const link = location.origin + location.pathname + "#" + s.date;
   return body + (withLink ? `\n\n——每日道義｜${s.title}\n${link}` : "");
 }
@@ -910,6 +918,7 @@ function talkOf(s){
     {stage:"合", time:"2:30–3:00", text:"回到求道人自身，留下一句帶走的話。"}], script: "", questions: [], pitfalls: [] };
 }
 function cardOf(s){
+  if(s.card) return JSON.parse(plainTxt(JSON.stringify(s.card)));
   return s.card || { kicker: s.series || "每日道義", headline: s.title, sub: s.source || "", points: (s.examples||[]).slice(0,3).map(x => x.title), closing: paras(s.reflection)[0] || "" };
 }
 function renderPractice(){
@@ -1116,7 +1125,41 @@ async function boot(force){
 }
 boot(false);
 if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});
-document.addEventListener("visibilitychange", () => { if(document.visibilityState === "visible" && index.length){ const before = index[0]?.date; loadIndex(true).then(() => { if(index[0]?.date !== before){ openStory(index[0].date); toast("今天的故事來了"); } }).catch(()=>{}); } });
+let lastRefresh = Date.now(), swReg = null;
+async function refresh(manual){
+  const before = index[0]?.date;
+  try{
+    swReg?.update().catch(()=>{});
+    await loadIndex(true); cache = {}; lastRefresh = Date.now();
+    if(index[0] && index[0].date !== before){ await openStory(index[0].date); go("read"); toast("今天的故事來了"); }
+    else if(manual){ if(current) await openStory(current.date, false); if(view === "list") renderList(); toast("已是最新"); }
+  }catch(e){ if(manual) toast("連線失敗，稍後再試"); }
+}
+document.addEventListener("visibilitychange", () => { if(document.visibilityState === "visible" && index.length && Date.now() - lastRefresh > 30000) refresh(false); });
+addEventListener("pageshow", e => { if(e.persisted) refresh(false); });
+if("serviceWorker" in navigator){
+  let reloaded = false; const hadController = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener("controllerchange", () => { if(reloaded || !hadController) return; reloaded = true; location.reload(); });
+  navigator.serviceWorker.ready.then(r => swReg = r).catch(()=>{});
+}
+/* pull to refresh (touch screens) */
+(() => {
+  if(!("ontouchstart" in window)) return;
+  const ptr = $("#ptr"), ico = ptr.querySelector("svg"); let y0 = null, dy = 0, busy = false;
+  addEventListener("touchstart", e => { if(scrollY <= 0 && !busy && !$("#sheet").classList.contains("on")) { y0 = e.touches[0].clientY; dy = 0; } }, {passive:true});
+  addEventListener("touchmove", e => {
+    if(y0 == null) return; dy = e.touches[0].clientY - y0;
+    if(dy <= 0 || scrollY > 0){ ptr.style.transform = ""; return; }
+    const d = Math.min(dy * .5, 90); ptr.style.transform = `translate(-50%, ${d - 60}px)`; ico.style.transform = `rotate(${d * 4}deg)`;
+  }, {passive:true});
+  addEventListener("touchend", async () => {
+    if(y0 == null) return; const pulled = dy * .5 > 60; y0 = null;
+    if(!pulled){ ptr.style.transform = ""; return; }
+    busy = true; ptr.classList.add("spin"); ptr.style.transform = "translate(-50%, 16px)";
+    await refresh(true);
+    ptr.classList.remove("spin"); ptr.style.transform = ""; busy = false;
+  });
+})();
 })();
 </script>
 </body>

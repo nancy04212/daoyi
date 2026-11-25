@@ -33,7 +33,7 @@ def speakable(t):
     t = str(t)
     for k in keys:
         t = t.replace(k, pron[k])
-    t = re.sub(r"[「」『』]", "", t)
+    t = re.sub(r"[「」『』〖〗]", "", t)
     t = t.replace("——", "，").replace("…", "，").replace("vs.", "和")
     return t.strip()
 
@@ -55,7 +55,8 @@ def segments(s):
         for vi, v in enumerate(s["verses"]):
             seg.append((f"verse-{vi}", (v.get("label", "") + "。" if v.get("label") else "") + "".join(v.get("lines", []))))
             for ni, n in enumerate(v.get("notes", [])):
-                seg.append((f"note-{vi}-{ni}", n.get("term", "") + "。" + "".join(paras(n.get("text"))) + (("白話來說：" + n["plain"]) if n.get("plain") else "")))
+                parts = "".join(f"{x.get('w','')}，{x.get('m','')}。" for x in n.get("parts", []))
+                seg.append((f"note-{vi}-{ni}", n.get("term", "") + "。" + (("白話來說：" + n["plain"]) if n.get("plain") else "") + parts + "".join(paras(n.get("text")))))
     if s.get("yiguandao"):
         seg.append(("dao", "與道的連結。" + "".join(paras(s["yiguandao"]))))
     m = s.get("modern") or {}
