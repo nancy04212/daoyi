@@ -21,9 +21,10 @@
 (function(){try{
   var g=function(k,d){var v=localStorage.getItem("dy:"+k);return v==null?d:JSON.parse(v)};
   var t=g("theme","auto"), r=document.documentElement;
+  if(t==="paper") t="sepia";
   if(t==="auto") t=matchMedia("(prefers-color-scheme: dark)").matches?"night":"sepia";
-  r.dataset.theme=t; r.dataset.font=g("font","serif");
-  r.style.setProperty("--fs",g("fs",18)+"px"); r.style.setProperty("--lh",g("lh",2));
+  r.dataset.theme=t; r.dataset.font=g("font","sans"); r.dataset.para=g("para","space");
+  r.style.setProperty("--fs",g("fs",18)+"px"); r.style.setProperty("--lh",Math.min(2,g("lh",1.75)));
 }catch(e){document.documentElement.dataset.theme="sepia"}})();
 </script>
 <style>
@@ -34,15 +35,14 @@
   --serifF:"Noto Serif TC","Songti TC","PMingLiU",serif;
   --red:#a3301f; --gold:#a8822f;
 }
-html[data-theme="paper"]{--bg:#ffffff;--bg2:#f4f1ec;--card:#faf8f5;--ink:#222222;--ink2:#4f4a45;--mute:#8d867e;--line:rgba(0,0,0,.1);--fill:rgba(0,0,0,.05);--mark:rgba(168,130,47,.22)}
-html[data-theme="sepia"]{--bg:#f7f2e8;--bg2:#efe7d6;--card:#fffcf6;--ink:#2e2620;--ink2:#5a4e44;--mute:#94877a;--line:rgba(70,45,20,.12);--fill:rgba(70,45,20,.06);--mark:rgba(168,130,47,.24)}
-html[data-theme="green"]{--bg:#e6eedc;--bg2:#d9e4cd;--card:#f1f6ea;--ink:#25301f;--ink2:#46533d;--mute:#7d8a72;--line:rgba(30,50,20,.13);--fill:rgba(30,50,20,.06);--mark:rgba(120,140,40,.25)}
-html[data-theme="night"]{--bg:#1b1916;--bg2:#24211d;--card:#24211d;--ink:#ddd3c3;--ink2:#b5aa99;--mute:#857a6c;--line:rgba(255,240,220,.1);--fill:rgba(255,240,220,.06);--mark:rgba(216,176,100,.22);--red:#df7a62;--gold:#d3ad62}
+html[data-theme="sepia"]{--bg:#F7F3E8;--bg2:#EFE9DA;--card:#FCF9F1;--ink:#2C2B29;--ink2:#55524C;--mute:#7A766E;--line:rgba(60,50,30,.12);--fill:rgba(60,50,30,.06);--mark:rgba(168,130,47,.24)}
+html[data-theme="green"]{--bg:#E6EFE6;--bg2:#D8E5D8;--card:#F1F6F0;--ink:#243026;--ink2:#46554A;--mute:#68786A;--line:rgba(30,50,30,.13);--fill:rgba(30,50,30,.06);--mark:rgba(110,140,60,.25)}
+html[data-theme="night"]{--bg:#1C1C1E;--bg2:#232325;--card:#2C2C2E;--ink:#C7C7CC;--ink2:#A1A1A6;--mute:#6E6E73;--line:rgba(255,255,255,.1);--fill:rgba(255,255,255,.06);--mark:rgba(216,176,100,.22);--red:#E07A63;--gold:#D3AD62}
 html[data-font="serif"]{--read:var(--serifF)}
 html[data-font="sans"]{--read:"Noto Sans TC",var(--sans)}
 
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;background:var(--bg);color:var(--ink);transition:background .25s,color .25s}
+html,body{margin:0;background:var(--bg);color:var(--ink);transition:background .2s,color .2s}
 body{font-family:var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
 button{font-family:inherit;color:inherit;cursor:pointer;border:none;background:none;padding:0}
 a{color:inherit}
@@ -88,7 +88,9 @@ a{color:inherit}
 /* ============ reading typography (ebook) ============ */
 .read{font-family:var(--read);font-size:var(--fs);line-height:var(--lh);color:var(--ink);
   max-width:34em;margin:0 auto;font-feature-settings:"palt" 0;line-break:strict;word-break:normal;overflow-wrap:anywhere;hanging-punctuation:allow-end;font-kerning:none}
-.read p{margin:0 0 .85em;text-align:justify;text-justify:inter-character;text-indent:2em}
+.read{letter-spacing:.05em}
+.read p{margin:0 0 1.2em;text-align:justify;text-justify:inter-character;text-indent:0}
+html[data-para="indent"] .read .story p{margin:0;text-indent:2em}
 .read p.noindent,.box p,.qa .a p,.note p{text-indent:0}
 .sec{max-width:34em;margin:2.6em auto 1.1em;display:flex;align-items:center;gap:12px;font-family:var(--sans);font-size:13px;font-weight:800;letter-spacing:3px;color:var(--red);scroll-margin-top:24px}
 .sec::before{content:"";width:18px;height:2px;background:var(--red);border-radius:2px}
@@ -329,7 +331,7 @@ a.setrow:hover,button.setrow:hover{background:var(--fill)}
 .sizer button{width:44px;height:40px;border-radius:9px;font-family:var(--serifF);font-weight:700}
 .sizer button:hover{background:var(--line)}
 .sizer input{flex:1;accent-color:var(--red)}
-.preview{margin-top:16px;padding:14px 16px;border-radius:14px;background:var(--card);font-family:var(--read);font-size:var(--fs);line-height:var(--lh);text-align:justify;text-indent:2em;box-shadow:0 1px 0 var(--line)}
+.preview{margin-top:16px;padding:14px 16px 2px;border-radius:14px;background:var(--card);max-width:none;box-shadow:0 1px 0 var(--line)}
 input[type=range]{accent-color:var(--red)}
 
 /* ============ mini player / sheet / toast ============ */
@@ -408,6 +410,19 @@ input[type=range]{accent-color:var(--red)}
   .toc{display:block;position:sticky;top:40px;align-self:start;margin-top:120px}
   #tocBtn{display:none}
 }
+.tabbar,.player{transition:transform .25s ease,opacity .25s ease}
+html.immersive .tabbar{transform:translateY(110%);opacity:0;pointer-events:none}
+html.immersive .player{transform:translateY(calc(var(--tabh) + 20px))}
+@media (min-width:900px){html.immersive .tabbar{transform:none;opacity:1;pointer-events:auto}}
+.swatches{display:flex;gap:18px;align-items:center}
+.swatches button{width:44px;height:44px;border-radius:50%;border:1px solid rgba(0,0,0,.12);position:relative}
+.swatches button.on::after{content:"";position:absolute;inset:-5px;border-radius:50%;border:2px solid var(--red)}
+.swatches .auto{width:auto;height:36px;border-radius:999px;padding:0 14px;font-size:13px;font-weight:600;background:var(--fill);border:none;color:var(--ink2)}
+.swatches .auto.on{background:var(--red);color:#fff}
+.swatches .auto.on::after{display:none}
+.slider{display:flex;align-items:center;gap:12px;background:var(--fill);border-radius:12px;padding:10px 14px}
+.slider input{flex:1;accent-color:var(--red)}
+.slider span{font-size:13px;color:var(--mute);min-width:44px;text-align:right;font-variant-numeric:tabular-nums}
 /* ===== iOS-style reading components ===== */
 .sec{font-size:13px;font-weight:600;letter-spacing:.5px;color:var(--mute);margin:2.4em auto .6em;padding:0 4px}
 .sec::before,.sec::after{display:none}
@@ -538,40 +553,41 @@ function closeSheet(){ $("#sheet").classList.remove("on"); $("#sheetBg").classLi
 $("#sheetBg").onclick = closeSheet;
 
 /* ---------- reading prefs ---------- */
-const THEMES = [["paper","白","#ffffff","#222"],["sepia","米","#f7f2e8","#2e2620"],["green","綠","#e6eedc","#25301f"],["night","夜","#1b1916","#ddd3c3"]];
-let prefs = { theme: store.get("theme","auto"), font: store.get("font","serif"), fs: store.get("fs",18), lh: store.get("lh",2) };
+const THEMES = [["sepia","暖紙","#F7F3E8","#2C2B29"],["green","豆沙綠","#E6EFE6","#243026"],["night","夜間","#1C1C1E","#C7C7CC"]];
+let prefs = { theme: store.get("theme","auto"), font: store.get("font","sans"), fs: store.get("fs",18), lh: Math.min(2, store.get("lh",1.75)), para: store.get("para","space") };
+if(prefs.theme === "paper") prefs.theme = "sepia";
 let rate = store.get("rate", 0.95);
 function applyPrefs(){
   const r = document.documentElement;
   const t = prefs.theme === "auto" ? (matchMedia("(prefers-color-scheme: dark)").matches ? "night" : "sepia") : prefs.theme;
-  r.dataset.theme = t; r.dataset.font = prefs.font;
+  r.dataset.theme = t; r.dataset.font = prefs.font; r.dataset.para = prefs.para;
   r.style.setProperty("--fs", prefs.fs+"px"); r.style.setProperty("--lh", prefs.lh);
   const meta = document.querySelector('meta[name="theme-color"]'); meta.content = getComputedStyle(r).getPropertyValue("--bg").trim() || "#f7f2e8";
-  ["theme","font","fs","lh"].forEach(k => store.set(k, prefs[k]));
-  const tn = prefs.theme === "auto" ? "自動" : THEMES.find(x => x[0] === prefs.theme)[1];
+  ["theme","font","fs","lh","para"].forEach(k => store.set(k, prefs[k]));
+  const tn = prefs.theme === "auto" ? "自動" : (THEMES.find(x => x[0] === prefs.theme) || THEMES[0])[1];
   $("#prefSummary").textContent = `${tn}・${prefs.font === "serif" ? "明體" : "黑體"}・${prefs.fs}`;
 }
 matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", () => prefs.theme === "auto" && applyPrefs());
 function openPrefs(){
-  const lhOpts = [[1.8,"緊湊"],[2,"標準"],[2.25,"寬鬆"]];
   sheet(`<h3>閱讀設定<button class="x" data-close aria-label="關閉">✕</button></h3><div class="prefs">
-    <div class="lab">背景</div>
-    <div class="themes">${THEMES.map(t => `<button data-t="${t[0]}" style="background:${t[2]};color:${t[3]}" class="${prefs.theme===t[0]?"on":""}"><i>文</i>${t[1]}</button>`).join("")}</div>
-    <div class="opt" style="margin-top:10px"><button data-t="auto" class="${prefs.theme==="auto"?"on":""}">跟隨系統（白天米色、晚上夜間）</button></div>
+    <div class="lab">主題</div>
+    <div class="swatches">${THEMES.map(t => `<button data-t="${t[0]}" style="background:${t[2]}" class="${prefs.theme===t[0]?"on":""}" aria-label="${t[1]}" title="${t[1]}"></button>`).join("")}<button data-t="auto" class="auto ${prefs.theme==="auto"?"on":""}">跟隨系統</button></div>
     <div class="lab">字型</div>
-    <div class="opt"><button data-f="serif" class="${prefs.font==="serif"?"on":""}" style="font-family:var(--serifF)">明體</button><button data-f="sans" class="${prefs.font==="sans"?"on":""}" style="font-family:'Noto Sans TC',var(--sans)">黑體</button></div>
+    <div class="opt"><button data-f="sans" class="${prefs.font==="sans"?"on":""}" style="font-family:'Noto Sans TC',var(--sans)">黑體</button><button data-f="serif" class="${prefs.font==="serif"?"on":""}" style="font-family:var(--serifF)">明體</button></div>
     <div class="lab">字級</div>
-    <div class="sizer"><button data-s="-1" style="font-size:14px" aria-label="縮小">A</button><input type="range" min="15" max="26" step="1" value="${prefs.fs}" id="fsR" aria-label="字級"><button data-s="1" style="font-size:22px" aria-label="放大">A</button></div>
+    <div class="slider"><span style="text-align:left;min-width:0;font-size:14px">A</span><input type="range" min="14" max="26" step="1" value="${prefs.fs}" id="fsR" aria-label="字級"><span style="font-size:20px;min-width:0">A</span></div>
     <div class="lab">行距</div>
-    <div class="opt">${lhOpts.map(o => `<button data-l="${o[0]}" class="${prefs.lh==o[0]?"on":""}">${o[1]}</button>`).join("")}</div>
-    <div class="preview">須菩提！於意云何？可以身相見如來不？不也，世尊！不可以身相見如來。何以故？如來所說身相，即非身相。</div>
+    <div class="slider"><input type="range" min="1.4" max="2" step="0.05" value="${prefs.lh}" id="lhR" aria-label="行距"><span id="lhV">${prefs.lh.toFixed(2)}</span></div>
+    <div class="lab">段落</div>
+    <div class="opt"><button data-p="space" class="${prefs.para==="space"?"on":""}">段間空行</button><button data-p="indent" class="${prefs.para==="indent"?"on":""}">段首縮排</button></div>
+    <div class="preview read"><div class="story"><p>須菩提！於意云何？可以身相見如來不？</p><p>不也，世尊！不可以身相見如來。何以故？如來所說身相，即非身相。</p></div></div>
   </div>`);
-  const re = () => { applyPrefs(); };
+  const re = () => applyPrefs();
   $$("#sheetBody [data-t]").forEach(b => b.onclick = () => { prefs.theme = b.dataset.t; $$("#sheetBody [data-t]").forEach(x => x.classList.toggle("on", x === b)); re(); });
   $$("#sheetBody [data-f]").forEach(b => b.onclick = () => { prefs.font = b.dataset.f; $$("#sheetBody [data-f]").forEach(x => x.classList.toggle("on", x === b)); re(); });
-  $$("#sheetBody [data-l]").forEach(b => b.onclick = () => { prefs.lh = +b.dataset.l; $$("#sheetBody [data-l]").forEach(x => x.classList.toggle("on", x === b)); re(); });
+  $$("#sheetBody [data-p]").forEach(b => b.onclick = () => { prefs.para = b.dataset.p; $$("#sheetBody [data-p]").forEach(x => x.classList.toggle("on", x === b)); re(); });
   $("#fsR").oninput = e => { prefs.fs = +e.target.value; re(); };
-  $$("#sheetBody [data-s]").forEach(b => b.onclick = () => { prefs.fs = Math.max(15, Math.min(26, prefs.fs + +b.dataset.s)); $("#fsR").value = prefs.fs; re(); });
+  $("#lhR").oninput = e => { prefs.lh = +e.target.value; $("#lhV").textContent = prefs.lh.toFixed(2); re(); };
 }
 $("#openPrefs").onclick = openPrefs;
 applyPrefs();
@@ -594,6 +610,7 @@ async function getStory(date){
 /* ---------- routing ---------- */
 let view = "read";
 function go(v){
+  document.documentElement.classList.remove("immersive");
   view = v;
   $$(".view").forEach(el => el.classList.toggle("hidden", el.id !== "v-"+v));
   $$(".tab").forEach(b => b.classList.toggle("on", b.dataset.v === v));
@@ -1185,6 +1202,16 @@ if("serviceWorker" in navigator){
   navigator.serviceWorker.addEventListener("controllerchange", () => { if(reloaded || !hadController) return; reloaded = true; location.reload(); });
   navigator.serviceWorker.ready.then(r => swReg = r).catch(()=>{});
 }
+/* tap the text to hide / show bars (mobile reading) */
+document.addEventListener("click", e => {
+  if(view !== "read" || isDesktop()) return;
+  if(e.target.closest("button,a,summary,details,input,textarea,.sheet,.player,.tabbar,.pager")) return;
+  if(!e.target.closest(".read,.vsrc,.note")) return;
+  if(getSelection && String(getSelection()).length) return;
+  const on = document.documentElement.classList.toggle("immersive");
+  if(on && !store.get("immHint", false)){ store.set("immHint", true); toast("再點一下文字可顯示工具列"); }
+});
+addEventListener("scroll", () => { if(scrollY < 40) document.documentElement.classList.remove("immersive"); }, {passive:true});
 /* pull to refresh (touch screens) */
 (() => {
   if(!("ontouchstart" in window)) return;
