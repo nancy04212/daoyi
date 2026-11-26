@@ -471,6 +471,13 @@ html.immersive .player{transform:translateY(calc(var(--tabh) + 20px))}
 .n-chev{width:7px;height:7px;border-right:1.8px solid currentColor;border-bottom:1.8px solid currentColor;transform:rotate(45deg);transition:.2s;margin-top:-3px}
 .n-det[open] .n-chev{transform:rotate(-135deg);margin-top:3px}
 .n-body{background:var(--fill);font-size:.94em}
+.nseg{width:168px;margin:-.2em 0 14px max(4px,calc((100% - 34em)/2))}
+.nseg button{padding:6px 0;font-size:13px}
+html[data-notes="full"] .n-det summary{display:none}
+html[data-notes="full"] .n-body{background:transparent}
+html[data-notes="full"] .n-body .n-row::before,html[data-notes="full"] .n-body .n-more::before{left:16px;right:16px}
+html[data-notes="full"] .n-det{border-top:0}
+.n-body .n-quote p.q{font-weight:500}
 .n-body .n-row::before,.n-body .n-more::before{left:16px}
 .note .n-quote p.mean{margin-top:3px;color:var(--ink2)}
 /* ===== iOS-style reading components ===== */
@@ -611,6 +618,7 @@ const THEMES = [["sepia","暖紙","#F7F3E8","#2C2B29"],["green","豆沙綠","#E6
 let prefs = { theme: store.get("theme","auto"), font: store.get("font","sans"), fs: store.get("fs",18), lh: Math.min(2, store.get("lh",1.75)), para: store.get("para","space") };
 if(prefs.theme === "paper") prefs.theme = "sepia";
 let rate = store.get("rate", 0.95);
+let noteMode = store.get("noteMode", "full");
 function applyPrefs(){
   const r = document.documentElement;
   const t = prefs.theme === "auto" ? (matchMedia("(prefers-color-scheme: dark)").matches ? "night" : "sepia") : prefs.theme;
@@ -718,6 +726,7 @@ function renderRead(){
   h += sec("s-story","故事") + `<div class="story">${paras(s.story).map((p,i) => `<p data-i="${i}" data-k="story-${i}">${fmt(p)}</p>`).join("")}</div>`;
   if(s.verses?.length){
     h += sec("s-verse","逐句細解");
+    if(s.verses.some(v => (v.notes||[]).some(n => n.quotes?.length || n.parts?.length || n.text))) h += `<div class="seg nseg" id="nSeg"><button data-n="full"${noteMode==="full"?' class="on"':""}>完整</button><button data-n="brief"${noteMode==="brief"?' class="on"':""}>精簡</button></div>`;
     s.verses.forEach((v, vi) => {
       h += `<div class="vsrc"><div class="vlabel">${esc(v.label || "經文")}</div><div class="vlines" data-k="verse-${vi}">${(v.lines||[]).map(esc).join("<br>")}</div></div>`;
       (v.notes||[]).forEach((n, ni) => h += noteHTML(n, `note-${vi}-${ni}`));
@@ -776,6 +785,13 @@ addEventListener("scroll", updateProgress, {passive:true});
 addEventListener("resize", updateProgress);
 
 /* ---------- note (iOS grouped card) ---------- */
+function setNoteMode(m){
+  noteMode = m; store.set("noteMode", m); document.documentElement.dataset.notes = m;
+  document.querySelectorAll(".n-det").forEach(d => d.open = m === "full");
+  document.querySelectorAll("#nSeg button").forEach(b => b.classList.toggle("on", b.dataset.n === m));
+}
+document.documentElement.dataset.notes = noteMode;
+document.addEventListener("click", e => { const b = e.target.closest("#nSeg button"); if(b){ e.stopPropagation(); setNoteMode(b.dataset.n); } }, true);
 function noteHTML(n, key){
   let h = `<div class="note" data-k="${key}"><div class="n-main"><div class="n-term">${fmt(n.term)}</div>`;
   if(n.sounds?.length) h += `<div class="n-sound">${n.sounds.map(x => `${esc(x.w)} <i>${esc(x.z)}</i>${x.m ? `・${esc(x.m)}` : ""}`).join("　")}</div>`;
@@ -784,7 +800,7 @@ function noteHTML(n, key){
   const qs = n.quotes || [], hasMore = qs.length || n.parts?.length || n.text;
   if(hasMore){
     const label = [n.parts?.length ? "詞義" : "", qs.length ? `${[...new Set(qs.map(q => (q.src||"").replace(/[「」].*$/,"")))].filter(Boolean)[0] || "註解"}等 ${qs.length} 則` : "", !qs.length && !n.parts?.length ? "補充" : ""].filter(Boolean).join("・");
-    h += `<details class="n-det"><summary><span>${esc(label)}</span><i class="n-chev"></i></summary><div class="n-body">`;
+    h += `<details class="n-det"${noteMode === "full" ? " open" : ""}><summary><span>${esc(label)}</span><i class="n-chev"></i></summary><div class="n-body">`;
     if(n.parts?.length) h += `<div class="n-row"><span class="n-lab">詞義拆解</span><dl class="parts">${n.parts.map(x => `<dt>${fmt(x.w)}</dt><dd>${fmt(x.m)}</dd>`).join("")}</dl></div>`;
     qs.forEach(q => { h += `<div class="n-row n-quote"><span class="n-lab">${esc(q.src || "原文")}</span><p class="q">「${fmt(q.text)}」</p>${q.mean ? `<p class="mean">${fmt(q.mean)}</p>` : ""}</div>`; });
     if(n.text) h += `<div class="n-more">${P(n.text)}</div>`;
