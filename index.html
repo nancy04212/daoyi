@@ -10,6 +10,42 @@
 <meta name="theme-color" content="#f7f2e8">
 <meta name="description" content="每天一則經典、訓文故事，附逐句細解與練講工具。">
 <title>每日道義</title>
+<script>
+/* 網址搬家：舊址 github.io → meiri-daoyi.pages.dev，並帶走本機進度 */
+(function(){
+  var NEW="https://meiri-daoyi.pages.dev/";
+  function pack(){var o={};try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf("dy:")===0)o[k]=localStorage.getItem(k);}}catch(e){}return o;}
+  function enc(o){return btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");}
+  function dec(t){t=t.replace(/-/g,"+").replace(/_/g,"/");while(t.length%4)t+="=";return JSON.parse(decodeURIComponent(escape(atob(t))));}
+  if(/\.github\.io$/.test(location.hostname)){
+    var d=pack(), url=NEW+location.search+(Object.keys(d).length?"#migrate="+enc(d):location.hash);
+    var standalone=(window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone;
+    if(!standalone){location.replace(url);return;}
+    window.__dyMoved=url;
+    document.addEventListener("DOMContentLoaded",function(){
+      var ios=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+      var m=document.createElement("div");
+      m.setAttribute("style","position:fixed;inset:0;z-index:9999;background:#F7F3E8;color:#2b2622;display:flex;align-items:center;justify-content:center;padding:32px;font:17px/1.7 -apple-system,'PingFang TC','Noto Sans TC',sans-serif;text-align:center");
+      m.innerHTML='<div style="max-width:340px"><img src="icons/icon-192.png" style="width:72px;height:72px;border-radius:18px"><h2 style="margin:16px 0 8px;font-size:22px">每日道義搬家了</h2>'+
+        '<p style="margin:0 0 20px;color:#6b625a">新網址<br><b style="color:#a3301f">meiri-daoyi.pages.dev</b></p>'+
+        '<a id="mvGo" href="'+url+'" style="display:block;background:#a3301f;color:#fff;border-radius:12px;padding:13px;text-decoration:none;font-weight:600">前往新網址</a>'+
+        '<button id="mvBk" style="margin-top:10px;width:100%;background:none;border:1px solid #d8cfc2;border-radius:12px;padding:12px;font:inherit;color:#2b2622">先備份進度</button>'+
+        '<p style="margin:18px 0 0;font-size:14px;color:#8a8178">'+(ios?'開啟後點分享 → 加入主畫面，再刪除這個舊圖示。若打卡紀錄沒出現，到「設定 → 還原進度」選剛才的備份檔。':'開啟後重新安裝到主畫面，再移除這個舊的。')+'</p></div>';
+      document.body.appendChild(m);
+      document.getElementById("mvBk").onclick=function(){
+        var b=new Blob([JSON.stringify(pack(),null,1)],{type:"application/json"}),a=document.createElement("a");
+        a.href=URL.createObjectURL(b);a.download="每日道義進度-"+new Date().toISOString().slice(0,10)+".json";document.body.appendChild(a);a.click();a.remove();
+      };
+    });
+    return;
+  }
+  var h=location.hash;
+  if(h.indexOf("#migrate=")===0){
+    try{var o=dec(h.slice(9));for(var k in o){if(k.indexOf("dy:")===0&&localStorage.getItem(k)==null)localStorage.setItem(k,o[k]);}}catch(e){}
+    history.replaceState(null,"",location.pathname+location.search);
+  }
+})();
+</script>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="icon" type="image/png" href="icons/icon-64.png">

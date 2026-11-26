@@ -21,8 +21,8 @@ DTSTART;TZID=Asia/Taipei:20261113T063000
 DTEND;TZID=Asia/Taipei:20261113T064500
 RRULE:FREQ=DAILY
 SUMMARY:🪷 每日道義故事
-DESCRIPTION:今天的故事已經準備好了。\n打開：https://nancy04212.github.io/daoyi/
-URL:https://nancy04212.github.io/daoyi/
+DESCRIPTION:今天的故事已經準備好了。\n打開：https://meiri-daoyi.pages.dev/
+URL:https://meiri-daoyi.pages.dev/
 TRANSP:TRANSPARENT
 BEGIN:VALARM
 ACTION:DISPLAY
@@ -37,8 +37,8 @@ DTSTART;TZID=Asia/Taipei:20261112T210000
 DTEND;TZID=Asia/Taipei:20261112T211000
 RRULE:FREQ=DAILY
 SUMMARY:🌙 今日實踐打卡
-DESCRIPTION:今天的實踐做到了嗎？花一分鐘回來打卡、寫一句心得。\n打開：https://nancy04212.github.io/daoyi/?v=act
-URL:https://nancy04212.github.io/daoyi/?v=act
+DESCRIPTION:今天的實踐做到了嗎？花一分鐘回來打卡、寫一句心得。\n打開：https://meiri-daoyi.pages.dev/?v=act
+URL:https://meiri-daoyi.pages.dev/?v=act
 TRANSP:TRANSPARENT
 BEGIN:VALARM
 ACTION:DISPLAY
